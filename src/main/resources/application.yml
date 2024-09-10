@@ -33,11 +33,11 @@ spring:
     password: secret
 
 rabbitmq:
-  queue:
+  chat-queue:
     name: "chat.queue"
-  exchange:
+  chat-exchange:
     name: "chat.exchange"
-  routing:
+  chat-routing:
     key: "*.room.*"
 
 logging:

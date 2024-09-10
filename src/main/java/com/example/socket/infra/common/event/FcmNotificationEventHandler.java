@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.util.concurrent.Executors;
-
 /**
  * FCM 푸시 알림을 처리하는 핸들러
  */

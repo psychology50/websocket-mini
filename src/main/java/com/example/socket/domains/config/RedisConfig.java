@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
@@ -41,47 +43,43 @@ public class RedisConfig {
 
     @Bean
     @Primary
-    LettuceConnectionFactory defaultConnectionFactory() {
+    RedisConnectionFactory defaultConnectionFactory() {
         return createConnectionFactoryWith(defaultCacheIndex);
     }
 
     @Bean
-    public CacheManager cacheManager(RedisCacheManager cacheManager) {
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10))
-                .disableCachingNullValues()
-                .serializeKeysWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(
-                                new StringRedisSerializer()))
-                .serializeValuesWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(
-                                new GenericJackson2JsonRedisSerializer()));
-
-        Map<String, RedisCacheConfiguration> cacheConfigurations = Map.of(
-                "users", config.entryTtl(Duration.ofMinutes(5)),
-                "rooms", config.entryTtl(Duration.ofMinutes(5))
-        );
-
-        return RedisCacheManager.builder(defaultConnectionFactory())
-                .cacheDefaults(config)
-                .withInitialCacheConfigurations(cacheConfigurations)
-                .transactionAware()
-                .build();
-    }
-
-    @Bean
     @Qualifier("chatServer")
-    LettuceConnectionFactory chatConnectionFactory() {
+    RedisConnectionFactory chatConnectionFactory() {
         return createConnectionFactoryWith(chatCacheIndex);
     }
 
+    @Bean
+    LettuceClientConfiguration clientConfiguration() {
+        return LettuceClientConfiguration.builder().build();
+    }
+
+    @Bean
+    public RedisCacheManager redisCacheManager(RedisConnectionFactory cf) {
+        RedisCacheConfiguration redisCacheConfiguration =
+                RedisCacheConfiguration.defaultCacheConfig()
+                        .serializeKeysWith(
+                                RedisSerializationContext.SerializationPair.fromSerializer(
+                                        new StringRedisSerializer()))
+                        .serializeValuesWith(
+                                RedisSerializationContext.SerializationPair.fromSerializer(
+                                        new GenericJackson2JsonRedisSerializer()))
+                        .entryTtl(Duration.ofHours(1L));
+
+        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(cf)
+                .cacheDefaults(redisCacheConfiguration)
+                .build();
+    }
+
     private LettuceConnectionFactory createConnectionFactoryWith(int index) {
-        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
-        configuration.setHostName(host);
-        configuration.setPort(port);
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
         configuration.setPassword(password);
         configuration.setDatabase(index);
 
-        return new LettuceConnectionFactory(configuration);
+        return new LettuceConnectionFactory(configuration, clientConfiguration());
     }
 }

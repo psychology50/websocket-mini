@@ -21,9 +21,9 @@ public class RabbitConfig {
     private final String CHAT_ROUTING_KEY;
 
     public RabbitConfig(
-            @Value("${spring.rabbitmq.chat-queue-name}") String CHAT_QUEUE_NAME,
-            @Value("${spring.rabbitmq.chat-exchange-name}") String CHAT_EXCHANGE_NAME,
-            @Value("${spring.rabbitmq.chat-routing-key}") String CHAT_ROUTING_KEY
+            @Value("${rabbitmq.chat-queue.name}") String CHAT_QUEUE_NAME,
+            @Value("${rabbitmq.chat-exchange.name}") String CHAT_EXCHANGE_NAME,
+            @Value("${rabbitmq.chat-routing.key}") String CHAT_ROUTING_KEY
     ) {
         this.CHAT_QUEUE_NAME = CHAT_QUEUE_NAME;
         this.CHAT_EXCHANGE_NAME = CHAT_EXCHANGE_NAME;
