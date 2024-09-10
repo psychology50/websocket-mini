@@ -1,12 +1,13 @@
 services:
   rabbitmq:
-    image: 'rabbitmq:latest'
+    image: 'rabbitmq:3.13.7-management'
     environment:
       - 'RABBITMQ_DEFAULT_PASS=secret'
-      - 'RABBITMQ_DEFAULT_USER=myuser'
+      - 'RABBITMQ_DEFAULT_USER=jayang'
+      - 'RABBITMQ_ERLANG_COOKIE=RabbitMQ-Cookies'
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672:5672" # rabbitMQ default port
+      - "15672:15672" # Web UI port
 
   redis:
     image: 'redis:latest'

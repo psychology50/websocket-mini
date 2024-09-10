@@ -3,7 +3,7 @@ spring:
     name: socket-server
 
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3300/pennyway?serverTimezone=Asia/Seoul&characterEncoding=utf8&postfileSQL=true&logger=Slf4JLogger&rewriteBatchedStatements=true}
+    url: ${DB_URL:jdbc:mysql://localhost:3300/socket?serverTimezone=Asia/Seoul&characterEncoding=utf8&postfileSQL=true&logger=Slf4JLogger&rewriteBatchedStatements=true}
     username: ${DB_USER_NAME:root}
     password: ${DB_PASSWORD:password}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -25,6 +25,20 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: jayang
+    password: secret
+
+rabbitmq:
+  queue:
+    name: "chat.queue"
+  exchange:
+    name: "chat.exchange"
+  routing:
+    key: "*.room.*"
 
 logging:
   level:
