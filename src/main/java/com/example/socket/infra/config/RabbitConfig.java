@@ -1,4 +1,4 @@
-package com.example.socket.config;
+package com.example.socket.infra.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;

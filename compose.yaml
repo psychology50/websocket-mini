@@ -15,4 +15,6 @@ services:
     command: redis-server --requirepass jayang
     ports:
       - '32768:6379'
-
+    labels:
+      - "name=redis"
+      - "mode=standalone"

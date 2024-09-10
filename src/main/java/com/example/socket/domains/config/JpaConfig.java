@@ -1,4 +1,4 @@
-package com.example.socket.config;
+package com.example.socket.domains.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
