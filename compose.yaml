@@ -5,8 +5,13 @@ services:
       - 'RABBITMQ_DEFAULT_PASS=secret'
       - 'RABBITMQ_DEFAULT_USER=myuser'
     ports:
-      - '5672'
+      - "5672:5672"
+      - "15672:15672"
+
   redis:
     image: 'redis:latest'
+    container_name: redis
+    command: redis-server --requirepass jayang
     ports:
-      - '6379'
+      - '32768:6379'
+

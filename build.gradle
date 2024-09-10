@@ -24,15 +24,28 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-amqp'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	/* MySQL */
+	implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.3.0'
+
+	/* JPA */
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	/* Redis */
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	/* Web Socket */
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	/* RabbitMQ */
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	implementation 'org.springframework.amqp:spring-rabbit-stream'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	annotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.amqp:spring-rabbit-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
