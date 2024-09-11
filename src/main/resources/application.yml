@@ -38,7 +38,7 @@ rabbitmq:
   chat-exchange:
     name: "chat.exchange"
   chat-routing:
-    key: "*.room.*"
+    key: "room.*"
 
 logging:
   level:

@@ -5,6 +5,7 @@ services:
       - 'RABBITMQ_DEFAULT_PASS=secret'
       - 'RABBITMQ_DEFAULT_USER=jayang'
       - 'RABBITMQ_ERLANG_COOKIE=RabbitMQ-Cookies'
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit plugins '[rabbitmq_management,rabbitmq_stomp,rabbitmq_web_stomp]'
     ports:
       - "5672:5672" # rabbitMQ default port
       - "15672:15672" # Web UI port
