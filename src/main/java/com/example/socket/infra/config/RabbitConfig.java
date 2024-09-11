@@ -64,8 +64,8 @@ public class RabbitConfig {
     public ConnectionFactory createConnectionFactory() {
         CachingConnectionFactory factory = new CachingConnectionFactory();
         factory.setHost("localhost");
-        factory.setUsername("guest");
-        factory.setPassword("guest");
+        factory.setUsername("jayang");
+        factory.setPassword("secret");
         factory.setPort(5672);
         factory.setVirtualHost("/");
         
