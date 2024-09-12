@@ -1,9 +1,16 @@
 package com.example.socket.chats.config;
 
+import com.example.socket.chats.common.handler.StompInboundInterceptor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompReactorNettyCodec;
+import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.tcp.reactor.ReactorNettyTcpClient;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -13,8 +20,11 @@ import reactor.netty.tcp.TcpClient;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSocketMessageBroker
 public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
+    private final StompInboundInterceptor stompInboundInterceptor;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
@@ -45,5 +55,30 @@ public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         config.setPathMatcher(new AntPathMatcher(".")); // url을 chat/room/3 -> chat.room.3으로 참조하기 위한 설정
         config.setApplicationDestinationPrefixes("/pub"); // 클라이언트에서 메시지 송신 시 프리픽스
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(new ChannelInterceptor() {
+//            @Override
+//            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+//                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+//                System.out.println("Inbound message: " + message);
+//                return message;
+//            }
+//        });
+        registration.interceptors(stompInboundInterceptor);
+    }
+
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new ChannelInterceptor() {
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+                System.out.println("Outbound message: " + message);
+                return message;
+            }
+        });
     }
 }
