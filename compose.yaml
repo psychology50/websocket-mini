@@ -1,14 +1,16 @@
 services:
   rabbitmq:
-    image: 'rabbitmq:3.13.7-management'
+    build: .
+    container_name: rabbitmq
     environment:
       - 'RABBITMQ_DEFAULT_PASS=secret'
       - 'RABBITMQ_DEFAULT_USER=jayang'
       - 'RABBITMQ_ERLANG_COOKIE=RabbitMQ-Cookies'
-      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit plugins '[rabbitmq_management,rabbitmq_stomp,rabbitmq_web_stomp]'
     ports:
-      - "5672:5672" # rabbitMQ default port
+      - "5672:5672"   # RabbitMQ default port
       - "15672:15672" # Web UI port
+      - "61613:61613" # STOMP port
+      - "15674:15674" # Web STOMP port
 
   redis:
     image: 'redis:latest'
