@@ -27,11 +27,12 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
 
   rabbitmq:
-    host: localhost
+    host: ${RABBITMQ_HOST:localhost}
     port: 5672
     username: jayang
     password: secret
     virtual-host: /
+
   cloud:
     openfeign:
       httpclient:

@@ -21,15 +21,18 @@ public class RabbitConfig {
     private final String CHAT_QUEUE_NAME;
     private final String CHAT_EXCHANGE_NAME;
     private final String CHAT_ROUTING_KEY;
+    private final String RABBITMQ_HOST;
 
     public RabbitConfig(
             @Value("${rabbitmq.chat-queue.name}") String CHAT_QUEUE_NAME,
             @Value("${rabbitmq.chat-exchange.name}") String CHAT_EXCHANGE_NAME,
-            @Value("${rabbitmq.chat-routing.key}") String CHAT_ROUTING_KEY
+            @Value("${rabbitmq.chat-routing.key}") String CHAT_ROUTING_KEY,
+            @Value("${spring.rabbitmq.host}") String RABBITMQ_HOST
     ) {
         this.CHAT_QUEUE_NAME = CHAT_QUEUE_NAME;
         this.CHAT_EXCHANGE_NAME = CHAT_EXCHANGE_NAME;
         this.CHAT_ROUTING_KEY = CHAT_ROUTING_KEY;
+        this.RABBITMQ_HOST = RABBITMQ_HOST;
     }
 
     // durable 옵션에 대한 정의 https://m.blog.naver.com/joyblog-/221988661550
@@ -70,7 +73,7 @@ public class RabbitConfig {
     @Bean
     public ConnectionFactory createConnectionFactory() {
         CachingConnectionFactory factory = new CachingConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost(RABBITMQ_HOST);
         factory.setUsername("jayang");
         factory.setPassword("secret");
         factory.setPort(5672);

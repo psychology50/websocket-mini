@@ -3,6 +3,7 @@ package com.example.socket.chats.config;
 import com.example.socket.chats.common.handler.StompInboundInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -21,14 +22,22 @@ import reactor.netty.tcp.TcpClient;
 
 @Slf4j
 @Configuration
-@RequiredArgsConstructor
 @EnableWebSocketMessageBroker
 public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final StompInboundInterceptor stompInboundInterceptor;
+    private final String RABBITMQ_HOST;
+
+    public WebBrokerSocketConfig(
+            StompInboundInterceptor stompInboundInterceptor,
+            @Value("${spring.rabbitmq.host}") String rabbitmqHost
+    ) {
+        this.stompInboundInterceptor = stompInboundInterceptor;
+        this.RABBITMQ_HOST = rabbitmqHost;
+    }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")
+        registry.addEndpoint("/chat")
 //                .setAllowedOrigins("*") // 이거 넣으면 allowedOrigins가 true일 때, * 못 넣으니까 pattern 쓰라고 에러 발생함.
                 .setAllowedOriginPatterns("*") // 실제 환경에선 API 서버 도메인만 허용
                 .withSockJS(); // JS 라이브러리. 우린 iOS라서 안 씀. 테스트를 위해 허용
@@ -38,7 +47,7 @@ public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry config) {
         TcpClient tcpClient = TcpClient
                 .create()
-                .host("localhost")
+                .host(RABBITMQ_HOST)
                 .port(61613);
 //                .secure(SslProvider.defaultClientProvider());
 
@@ -47,7 +56,7 @@ public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
                 .setAutoStartup(true)
                 .setTcpClient(client) // RabbitMQ와 연결할 클라이언트 설정
-                .setRelayHost("localhost") // RabbitMQ 서버 주소
+                .setRelayHost(RABBITMQ_HOST) // RabbitMQ 서버 주소
                 .setRelayPort(61613) // RabbitMQ 포트(5672), STOMP(61613)
                 .setSystemLogin("jayang") // RabbitMQ 시스템 계정
                 .setSystemPasscode("secret") // RabbitMQ 시스템 비밀번호

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(name = "chatServer", url = "${chat.server.url}")
+@FeignClient(name = "chatServer", url = "http://localhost:8080/chat")
 public interface ChatServerClient {
     @RequestMapping(value = "/ws", method = {RequestMethod.GET})
     ResponseEntity<byte[]> connectWebSocket(

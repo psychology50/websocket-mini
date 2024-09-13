@@ -18,7 +18,7 @@
 
     function connect() {
         // var socket = new SockJS('http://localhost:8080/ws', null, {transports: ["websocket", "xhr-streaming", "xhr-polling"]});
-        const socket = new WebSocket('ws://localhost:8080/ws');
+        const socket = new WebSocket('ws://localhost:80/ws');
         console.log(socket)
 
         stompClient = Stomp.over(socket);

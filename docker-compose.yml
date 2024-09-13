@@ -1,0 +1,64 @@
+version: '3'
+# docker-compose -f docker-compose.yml up -d
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile-server
+    container_name: spring-app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - redis
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: Dockerfile-rabbitmq
+    container_name: rabbitmq
+    environment:
+      - 'RABBITMQ_DEFAULT_PASS=secret'
+      - 'RABBITMQ_DEFAULT_USER=jayang'
+      - 'RABBITMQ_ERLANG_COOKIE=RabbitMQ-Cookies'
+    ports:
+      - "5672:5672"   # RabbitMQ default port
+      - "15672:15672" # Web UI port
+      - "61613:61613" # STOMP port
+      - "15674:15674" # Web STOMP port
+    networks:
+      - app-network
+
+  redis:
+    image: 'redis:latest'
+    container_name: redis
+    command: redis-server --requirepass jayang
+    ports:
+      - '32768:6379'
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    networks:
+      - app-network
+
+networks:
+  default:
+    driver: bridge
+  app-network:
+    driver: bridge
