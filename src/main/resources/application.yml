@@ -32,6 +32,18 @@ spring:
     username: jayang
     password: secret
     virtual-host: /
+  cloud:
+    openfeign:
+      httpclient:
+        enabled: true
+        max-connections: 5000
+        ok-http:
+          read-timeout: 60000
+      compression:
+        request:
+          enabled: true
+        response:
+          enabled: true
 
 rabbitmq:
   chat-queue:

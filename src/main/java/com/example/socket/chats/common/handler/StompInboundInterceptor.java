@@ -28,7 +28,7 @@ public class StompInboundInterceptor implements ChannelInterceptor {
 
             // 구독 전 필요한 처리 수행 (ex. 사용자 권한 확인, 구독 대상 변경, 로깅 등)
 
-            if (destination != null && destination.startsWith("/topic/")) {
+            if (destination != null && destination.startsWith("/sub/")) {
                 // RabbitMQ exchange 직접 접근 방지
                 String convertedDestination = convertDestination(destination);
                 log.info("preSend: convertedDestination={}", convertedDestination);
@@ -40,6 +40,6 @@ public class StompInboundInterceptor implements ChannelInterceptor {
     }
 
     private String convertDestination(String originalDestination) {
-        return originalDestination.replace("/topic/", "/exchange/chat.exchange/");
+        return originalDestination.replace("/sub/", "/exchange/chat.exchange/");
     }
 }

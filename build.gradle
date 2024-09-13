@@ -48,6 +48,11 @@ dependencies {
 	/* firebase */
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
 
+	/* feign */
+	implementation platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.1'
+	implementation 'io.github.openfeign:feign-okhttp:13.2'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	annotationProcessor 'org.projectlombok:lombok'
