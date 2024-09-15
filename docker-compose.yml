@@ -1,5 +1,7 @@
 version: '3'
+# docker system prune -af
 # docker-compose -f docker-compose.yml up -d
+# docker-compose -f docker-compose.yml down
 services:
   app:
     build:
@@ -20,9 +22,9 @@ services:
     image: nginx:latest
     container_name: nginx
     ports:
-      - "80:80"
+      - "8000:80"
     volumes:
-      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
     networks:

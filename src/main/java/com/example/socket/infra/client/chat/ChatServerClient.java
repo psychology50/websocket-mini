@@ -10,8 +10,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @FeignClient(name = "chatServer", url = "http://localhost:8080/chat")
 public interface ChatServerClient {
-    @RequestMapping(value = "/ws", method = {RequestMethod.GET})
+    @RequestMapping(value = "", method = {RequestMethod.GET})
     ResponseEntity<byte[]> connectWebSocket(
+            @RequestHeader HttpHeaders headers,
+            @RequestBody(required = false) byte[] body
+    );
+
+    @RequestMapping(value = "", method = {RequestMethod.POST})
+    ResponseEntity<byte[]> connectWebSocketPost(
             @RequestHeader HttpHeaders headers,
             @RequestBody(required = false) byte[] body
     );
