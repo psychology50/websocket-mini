@@ -15,10 +15,4 @@ public interface ChatServerClient {
             @RequestHeader HttpHeaders headers,
             @RequestBody(required = false) byte[] body
     );
-
-    @RequestMapping(value = "", method = {RequestMethod.POST})
-    ResponseEntity<byte[]> connectWebSocketPost(
-            @RequestHeader HttpHeaders headers,
-            @RequestBody(required = false) byte[] body
-    );
 }

@@ -69,14 +69,6 @@ public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(new ChannelInterceptor() {
-//            @Override
-//            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-//                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-//                System.out.println("Inbound message: " + message);
-//                return message;
-//            }
-//        });
         registration.interceptors(stompInboundInterceptor);
     }
 
@@ -86,7 +78,7 @@ public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-                System.out.println("Outbound message: " + message);
+                log.info("Outbound message: {}", message);
                 return message;
             }
         });

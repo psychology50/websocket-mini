@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 public class ChatMessageConsumer {
     private final RabbitMessagingTemplate rabbitMessagingTemplate;
 
-//    @RabbitListener(queues = "${rabbitmq.chat-queue.name}")
-//    public void receiveMessage(ChatMessage message) {
-//        log.info("Consume Message = {}", message);
-//        String destination = "/topic/chat.room." + message.roomId();
-//        log.info("destination = {}", destination);
-//
-//        rabbitMessagingTemplate.convertAndSend(destination, message);
-//    }
+    @RabbitListener(queues = "${rabbitmq.chat-queue.name}")
+    public void receiveMessage(ChatMessage message) {
+        log.info("Consume Message = {}", message);
+        String destination = "/topic/chat.room." + message.roomId();
+        log.info("destination = {}", destination);
+
+        rabbitMessagingTemplate.convertAndSend(destination, message);
+    }
 }

@@ -32,6 +32,16 @@ spring:
     username: jayang
     password: secret
     virtual-host: /
+#    listener: # 뭐하는 설정인지 몰라서 일단 주석 처리
+#      simple:
+#        default-requeue-rejected: false
+#        acknowledge-mode: manual
+#        retry:
+#          enabled: true
+#          max-attempts: 3
+#          initial-interval: 1000
+#          max-interval: 10000
+#          multiplier: 2
 
   cloud:
     openfeign:

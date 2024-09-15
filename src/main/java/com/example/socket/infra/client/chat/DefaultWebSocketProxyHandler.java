@@ -16,13 +16,7 @@ public class DefaultWebSocketProxyHandler implements WebSocketProxyHandler {
 
     @Override
     public ResponseEntity<byte[]> handle(HttpServletRequest request, HttpHeaders headers) {
-        if (request.getMethod().equals(HttpMethod.GET.name())) {
-            return chatServerClient.connectWebSocket(headers, getBody(request));
-        } else if (request.getMethod().equals(HttpMethod.POST.name())) {
-            return chatServerClient.connectWebSocketPost(headers, getBody(request));
-        }
-
-        throw new IllegalArgumentException("Unsupported method: " + request.getMethod());
+        return chatServerClient.connectWebSocket(headers, getBody(request));
     }
 
     private byte[] getBody(HttpServletRequest request) {
