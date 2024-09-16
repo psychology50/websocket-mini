@@ -31,9 +31,7 @@ services:
       - app-network
 
   rabbitmq:
-    build:
-      context: . # build docker file location
-      dockerfile: Dockerfile-rabbit # docker file name
+    image: rabbitmq:3.13.7-management
     container_name: rabbitmq
     environment:
       - 'RABBITMQ_DEFAULT_PASS=secret'
@@ -43,7 +41,11 @@ services:
       - "5672:5672"   # RabbitMQ default port
       - "15672:15672" # Web UI port
       - "61613:61613" # STOMP port
-      - "15674:15674" # Web STOMP port
+    command: >
+      bash -c "
+        rabbitmq-plugins enable --offline rabbitmq_stomp rabbitmq_web_stomp &&
+        docker-entrypoint.sh rabbitmq-server
+      "
     networks:
       - app-network
 

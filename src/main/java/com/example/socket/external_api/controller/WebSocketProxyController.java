@@ -20,7 +20,7 @@ public class WebSocketProxyController {
 
     private final WebSocketProxyHandler webSocketProxyHandler;
 
-    @GetMapping("/server")
+    @GetMapping("")
     public ResponseEntity<?> getWebSocketServerUrl(
             HttpServletRequest request,
             @RequestHeader HttpHeaders headers
@@ -29,12 +29,12 @@ public class WebSocketProxyController {
     }
 
     @GetMapping("/info")
-    public ResponseEntity<StreamingResponseBody> connectWebSocket(
+    public ResponseEntity<StreamingResponseBody> getWebSocketServerInfo(
             HttpServletRequest request,
             @RequestHeader HttpHeaders headers
 //            @RequestParam("t") String timestamp
     ) {
-        log.info("connectWebSocketSub: {}", headers);
+        log.info("getWebSocketServerInfo: {}", headers);
 
         ResponseEntity<byte[]> response = webSocketProxyHandler.handle(request, headers);
         log.info("response: {}", response);

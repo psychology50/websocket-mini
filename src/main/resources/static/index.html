@@ -30,7 +30,7 @@
             const url = await getServerUrl();
             console.log("Connecting to:", url);
 
-            const socket = new SockJS(url, null, {transports: ["websocket", "xhr-streaming", "xhr-polling"]});
+            const socket = new SockJS(url, null, {transports: ["websocket"]});
             console.log(socket)
 
             stompClient = Stomp.over(socket);
@@ -56,7 +56,7 @@
 
     async function getServerUrl() {
         try {
-            const response = await fetch("http://localhost:8000/ws/server", {method: 'GET'});
+            const response = await fetch("http://localhost:8000/ws", {method: 'GET'});
             console.log("Response : " + response)
             const data = await response.json();
             console.log("Data : " + data)

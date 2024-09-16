@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient(name = "chatServer", url = "http://localhost:8080/chat")
 public interface ChatServerClient {
     @RequestMapping(value = "", method = {RequestMethod.GET})
-    ResponseEntity<byte[]> connectWebSocket(
+    ResponseEntity<byte[]> getWebSocketInfo(
             @RequestHeader HttpHeaders headers,
             @RequestBody(required = false) byte[] body
     );
+
 }
