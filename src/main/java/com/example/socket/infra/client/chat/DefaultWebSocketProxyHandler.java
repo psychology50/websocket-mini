@@ -19,11 +19,11 @@ public class DefaultWebSocketProxyHandler implements WebSocketProxyHandler {
     public WebSocket.Url getWebSocketServerUrl(HttpServletRequest request, HttpHeaders headers) {
         return new WebSocket.Url("http://localhost:8000/chat");
     }
-
-    @Override
-    public ResponseEntity<byte[]> handle(HttpServletRequest request, HttpHeaders headers) {
-        return chatServerClient.getWebSocketInfo(headers, getBody(request));
-    }
+//
+//    @Override
+//    public ResponseEntity<byte[]> handle(HttpServletRequest request, HttpHeaders headers) {
+//        return chatServerClient.getWebSocketInfo(headers, getBody(request));
+//    }
 
     private byte[] getBody(HttpServletRequest request) {
         try {

@@ -27,28 +27,28 @@ public class WebSocketProxyController {
     ) {
         return ResponseEntity.ok(webSocketProxyHandler.getWebSocketServerUrl(request, headers));
     }
-
-    @GetMapping("/info")
-    public ResponseEntity<StreamingResponseBody> getWebSocketServerInfo(
-            HttpServletRequest request,
-            @RequestHeader HttpHeaders headers
-//            @RequestParam("t") String timestamp
-    ) {
-        log.info("getWebSocketServerInfo: {}", headers);
-
-        ResponseEntity<byte[]> response = webSocketProxyHandler.handle(request, headers);
-        log.info("response: {}", response);
-
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.putAll(response.getHeaders());
-        log.info("responseHeaders: {}", responseHeaders);
-
-        return ResponseEntity.status(response.getStatusCode())
-                .headers(responseHeaders)
-                .body(outputStream -> {
-                    if (response.getBody() != null) {
-                        outputStream.write(response.getBody());
-                    }
-                });
-    }
+//
+//    @GetMapping("/info")
+//    public ResponseEntity<StreamingResponseBody> getWebSocketServerInfo(
+//            HttpServletRequest request,
+//            @RequestHeader HttpHeaders headers
+////            @RequestParam("t") String timestamp
+//    ) {
+//        log.info("getWebSocketServerInfo: {}", headers);
+//
+//        ResponseEntity<byte[]> response = webSocketProxyHandler.handle(request, headers);
+//        log.info("response: {}", response);
+//
+//        HttpHeaders responseHeaders = new HttpHeaders();
+//        responseHeaders.putAll(response.getHeaders());
+//        log.info("responseHeaders: {}", responseHeaders);
+//
+//        return ResponseEntity.status(response.getStatusCode())
+//                .headers(responseHeaders)
+//                .body(outputStream -> {
+//                    if (response.getBody() != null) {
+//                        outputStream.write(response.getBody());
+//                    }
+//                });
+//    }
 }

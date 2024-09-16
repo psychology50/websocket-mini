@@ -8,5 +8,5 @@ import org.springframework.http.ResponseEntity;
 public interface WebSocketProxyHandler {
     WebSocket.Url getWebSocketServerUrl(HttpServletRequest request, HttpHeaders headers);
 
-    ResponseEntity<byte[]> handle(HttpServletRequest request, HttpHeaders headers);
+//    ResponseEntity<byte[]> handle(HttpServletRequest request, HttpHeaders headers);
 }
