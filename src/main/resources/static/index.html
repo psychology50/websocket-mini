@@ -16,27 +16,55 @@
 <script>
     var stompClient = null;
 
-    function connect() {
-        // var socket = new SockJS('http://localhost:8080/ws', null, {transports: ["websocket", "xhr-streaming", "xhr-polling"]});
-        const socket = new SockJS('http://localhost:8080/chat', null, {transports: ["websocket", "xhr-streaming", "xhr-polling"]});
-        console.log(socket)
-
-        stompClient = Stomp.over(socket);
-
-        stompClient.debug = function(str) {
-            console.log(str);
-        };
-
-        stompClient.connect({}, function(frame) {
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/sub/chat.room.1', function(message) {
-                console.log('Received: ' + message);
-                showMessage(JSON.parse(message.body).content);
-            }, {'auto-delete':true, 'durable':false, 'exclusive':false});
-            // auto-delete: Consumer가 사라지면 자동 삭제되는 Queue
-            // durable: 서버와 연결이 끊어져도 메시지 보관 여부
-            // exclusive: 하나의 Consumer만 접근 가능 여부
+    function socket() {
+        connect().then(socket => {
+            console.log("Connected successfully");
+        }).catch(error => {
+            console.error("Connection error:", error);
         });
+    }
+
+    async function connect() {
+        // var socket = new SockJS('http://localhost:8080/ws', null, {transports: ["websocket", "xhr-streaming", "xhr-polling"]});
+        try {
+            const url = await getServerUrl();
+            console.log("Connecting to:", url);
+
+            const socket = new SockJS(url, null, {transports: ["websocket", "xhr-streaming", "xhr-polling"]});
+            console.log(socket)
+
+            stompClient = Stomp.over(socket);
+
+            stompClient.debug = function(str) {
+                console.log(str);
+            };
+
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/sub/chat.room.1', function(message) {
+                    console.log('Received: ' + message);
+                    showMessage(JSON.parse(message.body).content);
+                }, {'auto-delete':true, 'durable':false, 'exclusive':false});
+                // auto-delete: Consumer가 사라지면 자동 삭제되는 Queue
+                // durable: 서버와 연결이 끊어져도 메시지 보관 여부
+                // exclusive: 하나의 Consumer만 접근 가능 여부
+            });
+        } catch (error) {
+            console.error("Error connecting to server:", error);
+        }
+    }
+
+    async function getServerUrl() {
+        try {
+            const response = await fetch("http://localhost:8000/ws/server", {method: 'GET'});
+            console.log("Response : " + response)
+            const data = await response.json();
+            console.log("Data : " + data)
+            return data["url"];
+        } catch (error) {
+            console.error("Error fetching server URL:", error);
+            throw error;
+        }
     }
 
     function sendMessage() {
@@ -55,7 +83,7 @@
     }
 
     // Connect when the page loads
-    window.onload = connect;
+    window.onload = socket;
 </script>
 </body>
 </html>

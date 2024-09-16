@@ -1,5 +1,6 @@
 package com.example.socket.infra.client.chat;
 
+import com.example.socket.infra.client.chat.dto.WebSocket;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DefaultWebSocketProxyHandler implements WebSocketProxyHandler {
     private final ChatServerClient chatServerClient;
+
+    @Override
+    public WebSocket.Url getWebSocketServerUrl(HttpServletRequest request, HttpHeaders headers) {
+        return new WebSocket.Url("http://localhost:8000/ws");
+    }
 
     @Override
     public ResponseEntity<byte[]> handle(HttpServletRequest request, HttpHeaders headers) {

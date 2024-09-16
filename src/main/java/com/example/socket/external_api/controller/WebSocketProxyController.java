@@ -14,13 +14,22 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping(value = "/ws")
 @CrossOrigin(originPatterns = "*", methods = {RequestMethod.GET}, allowedHeaders = "*", allowCredentials = "true")
 public class WebSocketProxyController {
 
     private final WebSocketProxyHandler webSocketProxyHandler;
 
-    @GetMapping("/ws/info")
-    public ResponseEntity<StreamingResponseBody> connectWebSocketSub(
+    @GetMapping("/server")
+    public ResponseEntity<?> getWebSocketServerUrl(
+            HttpServletRequest request,
+            @RequestHeader HttpHeaders headers
+    ) {
+        return ResponseEntity.ok(webSocketProxyHandler.getWebSocketServerUrl(request, headers));
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<StreamingResponseBody> connectWebSocket(
             HttpServletRequest request,
             @RequestHeader HttpHeaders headers
 //            @RequestParam("t") String timestamp
