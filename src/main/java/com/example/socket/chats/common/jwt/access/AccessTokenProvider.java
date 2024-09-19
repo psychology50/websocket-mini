@@ -27,7 +27,7 @@ import static com.example.socket.chats.common.jwt.access.AccessTokenClaimKeys.US
 
 @Slf4j
 @Primary
-@Component
+@Component("chatAccessTokenProvider")
 public class AccessTokenProvider implements JwtProvider {
     private final SecretKey secretKey;
     private final Duration tokenExpiration;
