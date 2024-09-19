@@ -28,7 +28,7 @@ public class AuthenticateHandler implements ConnectCommandHandler {
     private final UserService userService;
 
     @Override
-    public boolean supports(StompCommand command) {
+    public boolean isSupport(StompCommand command) {
         return StompCommand.CONNECT.equals(command);
     }
 

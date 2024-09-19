@@ -14,7 +14,7 @@ public class ExchangeConvertHandler implements SubscribeCommandHandler {
     private static final String CONVERTED_EXCHANGE_PREFIX = "/exchange/chat.exchange/";
 
     @Override
-    public boolean supports(StompCommand command) {
+    public boolean isSupport(StompCommand command) {
         return StompCommand.SUBSCRIBE.equals(command);
     }
 

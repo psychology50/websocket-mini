@@ -7,26 +7,26 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class StompCommandHandlerFactory {
-    private Map<StompCommand, List<StompCommandHandler>> handlers = new EnumMap<>(StompCommand.class);
+    private final Map<StompCommand, List<StompCommandHandler>> handlers = new EnumMap<>(StompCommand.class);
 
     @Autowired
     public StompCommandHandlerFactory(List<StompCommandHandler> allHandlers) {
-        for (StompCommandHandler handler: allHandlers) {
-            for (StompCommand command: StompCommand.values()) {
-                log.info("StompCommandHandlerFactory: command={}", command);
-                if (handler.supports(command)) {
-                    handlers.computeIfAbsent(command, key -> new ArrayList<>()).add(handler);
-                }
-            }
-        }
-
+        allHandlers.forEach(this::registerHandler);
         log.info("StompCommandHandlerFactory: handlers={}", handlers);
+    }
+
+    private void registerHandler(StompCommandHandler handler) {
+        Arrays.stream(StompCommand.values())
+                .filter(handler::isSupport)
+                .forEach(command -> {
+                    handlers.computeIfAbsent(command, k -> new ArrayList<>()).add(handler);
+                    log.info("Registered handler {} for command {}", handler.getClass().getSimpleName(), command);
+                });
     }
 
     public List<StompCommandHandler> getHandlers(StompCommand command) {
