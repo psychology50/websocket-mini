@@ -1,7 +1,6 @@
 package com.example.socket.chats.config;
 
-import com.example.socket.chats.common.handler.StompInboundInterceptor;
-import lombok.RequiredArgsConstructor;
+import com.example.socket.chats.common.interceptor.StompInboundInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +15,6 @@ import org.springframework.messaging.tcp.reactor.ReactorNettyTcpClient;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.StompWebSocketEndpointRegistration;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import reactor.netty.tcp.TcpClient;
 @Slf4j
