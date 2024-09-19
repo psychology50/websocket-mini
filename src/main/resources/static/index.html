@@ -6,32 +6,136 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </head>
 <body>
-<div>
-    <input type="text" id="roomId" placeholder="Room ID">
-    <input type="text" id="message" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
-</div>
-<div id="messages"></div>
+    <button id="logoutButton" style="display: none;">Logout</button>
+
+    <div id="loginSection">
+        <input type="number" id="userId" placeholder="User ID">
+        <button id="loginButton">Login</button>
+        <div id="loginError" style="color: red;"></div>
+    </div>
+    <div id="chatSection" style="display: none;">
+        <input type="text" id="roomId" placeholder="Room ID">
+        <input type="text" id="message" placeholder="Type a message...">
+        <button id="sendButton">Send</button>
+        <div id="messages"></div>
+    </div>
 
 <script>
-    var stompClient = null;
+    const API_URL = 'http://localhost:8000';
+    let stompClient = null;
 
-    function socket() {
-        connect().then(socket => {
-            console.log("Connected successfully");
-        }).catch(error => {
-            console.error("Connection error:", error);
-        });
+    // Token Management
+    const TokenManager = {
+        setAccessToken: (token) => sessionStorage.setItem('accessToken', token),
+        getAccessToken: () => sessionStorage.getItem('accessToken'),
+        clearTokens: () => {
+            sessionStorage.removeItem('accessToken');
+            document.cookie = 'refreshToken=; Max-Age=0; path=/; secure; samesite=none';
+        }
+    };
+
+    // API Request Wrapper
+    async function apiRequest(url, options = {}) {
+        const accessToken = TokenManager.getAccessToken();
+        if (accessToken) {
+            options.headers = {
+                ...options.headers,
+                'Authorization': accessToken
+            };
+        }
+
+        try {
+            const response = await fetch(url, options);
+            if (response.status === 401) {
+                const refreshed = await refreshToken();
+                if (refreshed) {
+                    return apiRequest(url, options);
+                } else {
+                    throw new Error('Authentication failed');
+                }
+            }
+            return response;
+        } catch (error) {
+            console.error('API request failed:', error);
+            throw error;
+        }
     }
 
-    async function connect() {
-        // var socket = new SockJS('http://localhost:8080/ws', null, {transports: ["websocket", "xhr-streaming", "xhr-polling"]});
+    // Token Refresh
+    async function refreshToken() {
         try {
-            const url = await getServerUrl();
+            const response = await fetch(`${API_URL}/api/auth/refresh`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const data = await response;
+
+                console.log("[Refresh Token] : " + response.headers.get('Authorization'));
+
+                TokenManager.setAccessToken(response.headers.get('Authorization'));
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Token refresh failed:', error);
+            return false;
+        }
+    }
+
+    // Login Function
+    async function login() {
+        const userId = document.getElementById('userId').value;
+        try {
+            const response = await fetch(`${API_URL}/api/auth/login/${userId}`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const data = await response;
+                TokenManager.setAccessToken(response.headers.get('Authorization'));
+
+                console.log("[Access Token] : " + response.headers.get('Authorization'));
+
+                showChatSection();
+                connectWebSocket();
+            } else {
+                document.getElementById('loginError').textContent = 'Login failed';
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            document.getElementById('loginError').textContent = 'Login failed';
+        }
+    }
+
+    // Logout Function
+    async function logout() {
+        try {
+            await fetch(`${API_URL}/api/auth/logout`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': TokenManager.getAccessToken()
+                },
+                credentials: 'include'
+            });
+            TokenManager.clearTokens();
+            showLoginSection();
+            if (stompClient !== null) {
+                stompClient.disconnect();
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    }
+
+    // WebSocket Connection
+    async function connectWebSocket() {
+        try {
+            const url = await getSocketServerUrl();
             console.log("Connecting to:", url);
 
             const socket = new SockJS(url, null, {transports: ["websocket"]});
-            console.log(socket)
+            console.log(socket);
 
             stompClient = Stomp.over(socket);
 
@@ -39,24 +143,20 @@
                 console.log(str);
             };
 
-            stompClient.connect({}, function(frame) {
-                console.log('Connected: ' + frame);
-                stompClient.subscribe('/sub/chat.room.1', function(message) {
-                    console.log('Received: ' + message);
-                    showMessage(JSON.parse(message.body).content);
-                }, {'auto-delete':true, 'durable':false, 'exclusive':false});
-                // auto-delete: Consumer가 사라지면 자동 삭제되는 Queue
-                // durable: 서버와 연결이 끊어져도 메시지 보관 여부
-                // exclusive: 하나의 Consumer만 접근 가능 여부
-            });
+            const headers = {
+                'Authorization': TokenManager.getAccessToken()
+            };
+
+            stompClient.connect(headers, onConnected, onError);
         } catch (error) {
-            console.error("Error connecting to server:", error);
+            console.error('WebSocket connection error:', error);
+            showLoginSection();
         }
     }
 
-    async function getServerUrl() {
+    async function getSocketServerUrl() {
         try {
-            const response = await fetch("http://localhost:8000/ws", {method: 'GET'});
+            const response = await fetch(`${API_URL}/ws`, {method: 'GET'});
             console.log("Response : " + response)
             const data = await response.json();
             console.log("Data : " + data)
@@ -67,9 +167,32 @@
         }
     }
 
+    function onConnected(frame) {
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('/sub/chat.room.1', onMessageReceived, {'auto-delete':true, 'durable':false, 'exclusive':false});
+    }
+
+    function onError(error) {
+        console.error('WebSocket error:', error);
+        if (error.headers && error.headers.message === 'Unauthorized') {
+            refreshToken().then(success => {
+                if (success) {
+                    connectWebSocket();
+                } else {
+                    showLoginSection();
+                }
+            });
+        }
+    }
+
+    function onMessageReceived(message) {
+        console.log('Received: ' + message);
+        showMessage(JSON.parse(message.body).content);
+    }
+
     function sendMessage() {
-        var roomId = document.getElementById("roomId").value;
-        var content = document.getElementById("message").value;
+        const roomId = document.getElementById('roomId').value;
+        const content = document.getElementById('message').value;
         stompClient.send("/pub/chat.message." + roomId, {}, JSON.stringify({
             'roomId': roomId,
             'content': content
@@ -77,13 +200,29 @@
     }
 
     function showMessage(message) {
-        var messageElement = document.createElement('div');
+        const messageElement = document.createElement('div');
         messageElement.appendChild(document.createTextNode(message));
         document.getElementById('messages').appendChild(messageElement);
     }
 
-    // Connect when the page loads
-    window.onload = socket;
+    function showLoginSection() {
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('chatSection').style.display = 'none';
+        document.getElementById('logoutButton').style.display = 'none';
+    }
+
+    function showChatSection() {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('chatSection').style.display = 'block';
+        document.getElementById('logoutButton').style.display = 'block';
+    }
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('loginButton').addEventListener('click', login);
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+        document.getElementById('logoutButton').addEventListener('click', logout);
+    });
 </script>
 </body>
 </html>
