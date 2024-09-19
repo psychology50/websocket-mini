@@ -1,7 +1,12 @@
 package com.example.socket.chats.common.handler;
 
+import com.example.socket.chats.common.security.jwt.access.AccessTokenClaimKeys;
 import com.example.socket.chats.common.security.jwt.access.AccessTokenProvider;
+import com.example.socket.chats.common.security.principle.UserPrincipal;
+import com.example.socket.domains.user.domain.User;
+import com.example.socket.domains.user.service.UserService;
 import com.example.socket.infra.common.jwt.JwtClaims;
+import com.example.socket.infra.common.jwt.JwtClaimsParserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
@@ -13,11 +18,14 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 
+import java.security.Principal;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class StompInboundInterceptor implements ChannelInterceptor {
     private final AccessTokenProvider chatAccessTokenProvider;
+    private final UserService userService;
 
     @Override
     public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
@@ -38,7 +46,13 @@ public class StompInboundInterceptor implements ChannelInterceptor {
                 JwtClaims claims = chatAccessTokenProvider.getJwtClaimsFromToken(accessToken);
                 log.info("presSend: accessToken claims={}", claims);
 
-                accessor.setUser(principal); // 아직 미설정
+                Long userId = JwtClaimsParserUtil.getClaimsValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
+                log.info("preSend: userId={}", userId);
+
+                User user = userService.readById(userId);
+                Principal principal = UserPrincipal.from(user);
+
+                accessor.setUser(principal); // 채팅 유저 설정
             }
         }
 
