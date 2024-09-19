@@ -23,18 +23,21 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/auth")
-@CrossOrigin(originPatterns = "*", methods = {RequestMethod.GET, RequestMethod.POST}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(originPatterns = "*", methods = {RequestMethod.GET, RequestMethod.POST}, allowedHeaders = "*", allowCredentials = "true", exposedHeaders = {HttpHeaders.AUTHORIZATION, HttpHeaders.COOKIE})
 public class AuthController {
     private final UserService userService;
     private final AccessTokenProvider accessTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
 
     @GetMapping("/login/{userId}")
-    public ResponseEntity<?> login(@RequestParam("userId") Long userId) {
+    public ResponseEntity<?> login(@PathVariable("userId") Long userId) {
         User user = userService.readById(userId);
 
         String accessToken = accessTokenProvider.generateToken(AccessTokenClaim.of(user.getId(), user.getRole().getType()));
         String refreshToken = refreshTokenProvider.generateToken(RefreshTokenClaim.of(user.getId(), user.getRole().getType()));
+
+        log.info("accessToken: {}", accessToken);
+        log.info("refreshToken: {}", refreshToken);
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
@@ -46,7 +49,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .header(HttpHeaders.COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(Map.of("userId", userId));
     }
 
@@ -57,7 +60,7 @@ public class AuthController {
     ) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "")
-                .header(HttpHeaders.COOKIE, "refreshToken=; Max-Age=0")
+                .header(HttpHeaders.SET_COOKIE, "refreshToken=; Max-Age=0")
                 .body(Map.of("message", "로그아웃 되었습니다."));
     }
 
@@ -83,7 +86,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, newAccessToken)
-                .header(HttpHeaders.COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(Map.of("userId", userId));
     }
 }

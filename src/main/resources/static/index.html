@@ -26,7 +26,7 @@
 
     // Token Management
     const TokenManager = {
-        setAccessToken: (token) => sessionStorage.setItem('accessToken', token),
+        setAccessToken: (token) => sessionStorage.setItem('accessToken', "Bearer " + token),
         getAccessToken: () => sessionStorage.getItem('accessToken'),
         clearTokens: () => {
             sessionStorage.removeItem('accessToken');
@@ -69,8 +69,6 @@
                 credentials: 'include'
             });
             if (response.ok) {
-                const data = await response;
-
                 console.log("[Refresh Token] : " + response.headers.get('Authorization'));
 
                 TokenManager.setAccessToken(response.headers.get('Authorization'));
@@ -86,16 +84,20 @@
     // Login Function
     async function login() {
         const userId = document.getElementById('userId').value;
+
         try {
             const response = await fetch(`${API_URL}/api/auth/login/${userId}`, {
                 method: 'GET',
                 credentials: 'include'
             });
-            if (response.ok) {
-                const data = await response;
-                TokenManager.setAccessToken(response.headers.get('Authorization'));
 
-                console.log("[Access Token] : " + response.headers.get('Authorization'));
+            // 디버깅용 AT, RT 수신 확인
+            for (var pair of response.headers.entries()) {
+                console.log(pair[0]+ ': '+ pair[1]);
+            }
+
+            if (response.ok) {
+                TokenManager.setAccessToken(response.headers.get('authorization'));
 
                 showChatSection();
                 connectWebSocket();
@@ -144,9 +146,8 @@
             };
 
             const headers = {
-                'Authorization': TokenManager.getAccessToken()
+                Authorization: TokenManager.getAccessToken()
             };
-
             stompClient.connect(headers, onConnected, onError);
         } catch (error) {
             console.error('WebSocket connection error:', error);
@@ -156,7 +157,9 @@
 
     async function getSocketServerUrl() {
         try {
-            const response = await fetch(`${API_URL}/ws`, {method: 'GET'});
+            // const response = await fetch(`${API_URL}/ws`, {method: 'GET'});
+            const response = await apiRequest(`${API_URL}/ws`, {method: 'GET'});
+
             console.log("Response : " + response)
             const data = await response.json();
             console.log("Data : " + data)
@@ -193,7 +196,7 @@
     function sendMessage() {
         const roomId = document.getElementById('roomId').value;
         const content = document.getElementById('message').value;
-        stompClient.send("/pub/chat.message." + roomId, {}, JSON.stringify({
+        stompClient.send("/pub/chat.message." + roomId, {'Authorization': TokenManager.getAccessToken()}, JSON.stringify({
             'roomId': roomId,
             'content': content
         }));

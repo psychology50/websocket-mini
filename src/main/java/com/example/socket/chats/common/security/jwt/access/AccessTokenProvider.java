@@ -1,4 +1,4 @@
-package com.example.socket.chats.common.jwt.access;
+package com.example.socket.chats.common.security.jwt.access;
 
 import com.example.socket.config.util.DateUtil;
 import com.example.socket.infra.common.exception.JwtErrorCode;
@@ -22,8 +22,8 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
-import static com.example.socket.chats.common.jwt.access.AccessTokenClaimKeys.ROLE;
-import static com.example.socket.chats.common.jwt.access.AccessTokenClaimKeys.USER_ID;
+import static com.example.socket.chats.common.security.jwt.access.AccessTokenClaimKeys.ROLE;
+import static com.example.socket.chats.common.security.jwt.access.AccessTokenClaimKeys.USER_ID;
 
 @Slf4j
 @Primary

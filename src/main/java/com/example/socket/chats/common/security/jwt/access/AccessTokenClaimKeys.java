@@ -1,4 +1,4 @@
-package com.example.socket.chats.common.jwt.access;
+package com.example.socket.chats.common.security.jwt.access;
 
 public enum AccessTokenClaimKeys {
     USER_ID("id"),

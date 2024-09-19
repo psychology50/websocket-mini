@@ -1,4 +1,4 @@
-package com.example.socket.chats.common.jwt.access;
+package com.example.socket.chats.common.security.jwt.access;
 
 import com.example.socket.infra.common.jwt.JwtClaims;
 import lombok.AccessLevel;
