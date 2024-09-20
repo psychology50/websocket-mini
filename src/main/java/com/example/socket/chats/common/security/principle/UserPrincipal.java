@@ -6,27 +6,30 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 
 @Getter
 public class UserPrincipal implements Principal {
     private final Long userId;
-    private final String name;
-    private final String username;
-    private final String profileImageUrl;
-    private final Role role;
-    private final boolean isChatNotify;
+    private String name;
+    private String username;
+    private String profileImageUrl;
+    private Role role;
+    private boolean isChatNotify;
+    private LocalDateTime expiresAt; // 필요한가?
 
     @Builder
-    private UserPrincipal(Long userId, String name, String username, String profileImageUrl, Role role, boolean isChatNotify) {
+    private UserPrincipal(Long userId, String name, String username, String profileImageUrl, Role role, boolean isChatNotify, LocalDateTime expiresAt) {
         this.userId = userId;
         this.name = name;
         this.username = username;
         this.profileImageUrl = profileImageUrl;
         this.role = role;
         this.isChatNotify = isChatNotify;
+        this.expiresAt = expiresAt;
     }
 
-    public static UserPrincipal from(User user) {
+    public static UserPrincipal from(User user, LocalDateTime expiresAt) {
         return UserPrincipal.builder()
                 .userId(user.getId())
                 .name(user.getName())
@@ -34,6 +37,7 @@ public class UserPrincipal implements Principal {
                 .profileImageUrl(user.getProfileImageUrl())
                 .role(user.getRole())
                 .isChatNotify(user.getNotifySetting().isChatNotify())
+                .expiresAt(expiresAt)
                 .build();
     }
 

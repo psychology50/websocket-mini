@@ -18,6 +18,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -38,8 +39,9 @@ public class AuthenticateHandler implements ConnectCommandHandler {
 
         JwtClaims claims = chatAccessTokenProvider.getJwtClaimsFromToken(accessToken);
         Long userId = JwtClaimsParserUtil.getClaimsValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
+        LocalDateTime expiresDate = chatAccessTokenProvider.getExpiryDate(accessToken);
 
-        authenticateUser(accessor, userId);
+        authenticateUser(accessor, userId, expiresDate);
     }
 
     private String extractAccessToken(StompHeaderAccessor accessor) {
@@ -53,9 +55,9 @@ public class AuthenticateHandler implements ConnectCommandHandler {
         return authorization.substring(7);
     }
 
-    private void authenticateUser(StompHeaderAccessor accessor, Long userId) {
+    private void authenticateUser(StompHeaderAccessor accessor, Long userId, LocalDateTime expiresDate) {
         User user = userService.readById(userId);
-        Principal principal = UserPrincipal.from(user);
+        Principal principal = UserPrincipal.from(user, expiresDate);
 
         log.info("[인증 핸들러] 사용자 인증 완료: {}", principal);
 
