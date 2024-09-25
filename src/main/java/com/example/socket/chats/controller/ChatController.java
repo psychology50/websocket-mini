@@ -22,4 +22,9 @@ public class ChatController {
         log.info("principal: name={}", principal.getName());
         chatMessageProducer.sendMessage(message);
     }
+
+    @MessageMapping("chat.message.exception")
+    public void exceptionMessage() {
+        throw new RuntimeException("강제로 발생한 예외");
+    }
 }

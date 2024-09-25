@@ -38,6 +38,8 @@ public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
 //                .setAllowedOrigins("*") // 이거 넣으면 allowedOrigins가 true일 때, * 못 넣으니까 pattern 쓰라고 에러 발생함.
                 .setAllowedOriginPatterns("http://127.0.0.1:8000") // 실제 환경에선 API 서버 도메인만 허용
                 .withSockJS(); // JS 라이브러리. 우린 iOS라서 안 씀. 테스트를 위해 허용
+
+        registry.setErrorHandler();
     }
 
     @Override

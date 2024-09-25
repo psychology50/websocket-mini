@@ -147,6 +147,7 @@
 
             const headers = {
                 Authorization: TokenManager.getAccessToken()
+                // Authorization: "Invalid Token"
             };
             stompClient.connect(headers, onConnected, onError);
         } catch (error) {
@@ -157,7 +158,6 @@
 
     async function getSocketServerUrl() {
         try {
-            // const response = await fetch(`${API_URL}/ws`, {method: 'GET'});
             const response = await apiRequest(`${API_URL}/ws`, {method: 'GET'});
 
             console.log("Response : " + response)
