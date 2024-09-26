@@ -31,8 +31,6 @@ public class PreAuthorizeAspect {
      */
     @Around("@annotation(com.example.socket.chats.common.annotation.PreAuthorize)")
     public Object execute(final ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info("PreAuthenticateAspect.execute");
-
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);

@@ -30,6 +30,8 @@ public class WebSocketGlobalExceptionHandler {
     @MessageExceptionHandler(RuntimeException.class)
     public void handleRuntimeException(Principal principal, RuntimeException ex, @Payload Message<byte[]> message, StompHeaderAccessor accessor) {
         ErrorMessage errorMessage = ErrorMessage.of("5000", ex.getMessage());
+        log.error("handleRuntimeException: {}", errorMessage);
+
         template.convertAndSendToUser(principal.getName(), ERROR_DESTINATION, errorMessage);
     }
 }
