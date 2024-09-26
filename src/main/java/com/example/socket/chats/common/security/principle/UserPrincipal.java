@@ -16,7 +16,7 @@ public class UserPrincipal implements Principal {
     private String profileImageUrl;
     private Role role;
     private boolean isChatNotify;
-    private LocalDateTime expiresAt; // 필요한가?
+    private LocalDateTime expiresAt;
 
     @Builder
     private UserPrincipal(Long userId, String name, String username, String profileImageUrl, Role role, boolean isChatNotify, LocalDateTime expiresAt) {
@@ -68,6 +68,7 @@ public class UserPrincipal implements Principal {
                 ", profileImageUrl='" + profileImageUrl + '\'' +
                 ", role=" + role +
                 ", isChatNotify=" + isChatNotify +
+                ", expiresAt=" + expiresAt +
                 '}';
     }
 }

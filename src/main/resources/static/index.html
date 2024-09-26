@@ -202,14 +202,14 @@
     function sendMessage() {
         const roomId = document.getElementById('roomId').value;
         const content = document.getElementById('message').value;
-        // stompClient.send("/pub/chat.message." + roomId, {'Authorization': TokenManager.getAccessToken()}, JSON.stringify({
-        //     'roomId': roomId,
-        //     'content': content
-        // }));
-        stompClient.send("/pub/chat.message.exception", {'Authorization': TokenManager.getAccessToken()}, JSON.stringify({
+        stompClient.send("/pub/chat.message." + roomId, {'Authorization': TokenManager.getAccessToken()}, JSON.stringify({
             'roomId': roomId,
             'content': content
         }));
+        // stompClient.send("/pub/chat.message.exception", {'Authorization': TokenManager.getAccessToken()}, JSON.stringify({
+        //     'roomId': roomId,
+        //     'content': content
+        // }));
     }
 
     function showMessage(message) {

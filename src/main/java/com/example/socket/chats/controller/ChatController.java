@@ -1,5 +1,6 @@
 package com.example.socket.chats.controller;
 
+import com.example.socket.chats.common.annotation.PreAuthorize;
 import com.example.socket.chats.dto.ChatMessage;
 import com.example.socket.chats.producer.ChatMessageProducer;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,8 @@ public class ChatController {
     private final ChatMessageProducer chatMessageProducer;
 
     @MessageMapping("chat.message.{roomId}")
+    @PreAuthorize("isAnonymous()")
     public void sendMessage(@DestinationVariable String roomId, ChatMessage message, Principal principal) {
-        log.info("sendMessage: roomId={}, message={}", roomId, message);
-        log.info("principal: name={}", principal.getName());
         chatMessageProducer.sendMessage(message);
     }
 
