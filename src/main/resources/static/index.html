@@ -146,8 +146,8 @@
             };
 
             const headers = {
-                // Authorization: TokenManager.getAccessToken()
-                Authorization: "Invalid Token"
+                Authorization: TokenManager.getAccessToken()
+                // Authorization: "Invalid Token"
             };
             stompClient.connect(headers, onConnected, onError);
         } catch (error) {
@@ -173,6 +173,7 @@
     function onConnected(frame) {
         console.log('Connected: ' + frame);
         stompClient.subscribe('/sub/chat.room.1', onMessageReceived, {'auto-delete':true, 'durable':false, 'exclusive':false});
+        stompClient.subscribe('/user/queue/errors', onErrorReceived);
     }
 
     function onError(error) {
@@ -193,10 +194,19 @@
         showMessage(JSON.parse(message.body).content);
     }
 
+    function onErrorReceived(message) {
+        const error = JSON.parse(message.body);
+        console.log('Received error:', error);
+    }
+
     function sendMessage() {
         const roomId = document.getElementById('roomId').value;
         const content = document.getElementById('message').value;
-        stompClient.send("/pub/chat.message." + roomId, {'Authorization': TokenManager.getAccessToken()}, JSON.stringify({
+        // stompClient.send("/pub/chat.message." + roomId, {'Authorization': TokenManager.getAccessToken()}, JSON.stringify({
+        //     'roomId': roomId,
+        //     'content': content
+        // }));
+        stompClient.send("/pub/chat.message.exception", {'Authorization': TokenManager.getAccessToken()}, JSON.stringify({
             'roomId': roomId,
             'content': content
         }));

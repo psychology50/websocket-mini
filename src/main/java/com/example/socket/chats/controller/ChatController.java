@@ -24,7 +24,7 @@ public class ChatController {
     }
 
     @MessageMapping("chat.message.exception")
-    public void exceptionMessage() {
+    public void exceptionMessage(ChatMessage message, Principal principal) {
         throw new RuntimeException("강제로 발생한 예외");
     }
 }

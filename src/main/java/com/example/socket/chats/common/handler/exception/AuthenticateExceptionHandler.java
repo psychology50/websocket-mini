@@ -1,13 +1,11 @@
-package com.example.socket.chats.common.interceptor;
+package com.example.socket.chats.common.handler.exception;
 
-import com.example.socket.chats.common.handler.exception.StompExceptionInterceptor;
 import com.example.socket.chats.dto.ErrorMessage;
 import com.example.socket.infra.common.exception.JwtErrorException;
 import com.example.socket.infra.common.jwt.JwtErrorCodeUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -17,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AuthenticateExceptionInterceptor implements StompExceptionInterceptor {
+public class AuthenticateExceptionHandler implements StompExceptionHandler {
     private final ObjectMapper objectMapper;
     private static final byte[] EMPTY_PAYLOAD = new byte[0];
 
@@ -37,7 +35,7 @@ public class AuthenticateExceptionInterceptor implements StompExceptionIntercept
 
             errorHeaderAccessor.setMessage(jwtErrorException.getErrorCode().causedBy().getCode());
             errorHeaderAccessor.setLeaveMutable(true);
-            errorMessage = new ErrorMessage(jwtErrorException.getErrorCode().getExplainError());
+            errorMessage = ErrorMessage.of(jwtErrorException.getErrorCode().getExplainError());
         }
 
         extractClientHeaderAccessor(clientMessage, errorHeaderAccessor);

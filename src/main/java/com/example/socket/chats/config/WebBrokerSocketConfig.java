@@ -1,6 +1,6 @@
 package com.example.socket.chats.config;
 
-import com.example.socket.chats.common.handler.exception.StompExceptionHandler;
+import com.example.socket.chats.common.interceptor.StompExceptionInterceptor;
 import com.example.socket.chats.common.interceptor.StompInboundInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompReactorNettyCodec;
+import org.springframework.messaging.simp.user.UserDestinationMessageHandler;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.tcp.reactor.ReactorNettyTcpClient;
 import org.springframework.util.AntPathMatcher;
@@ -23,16 +24,16 @@ import reactor.netty.tcp.TcpClient;
 @EnableWebSocketMessageBroker
 public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final StompInboundInterceptor stompInboundInterceptor;
-    private final StompExceptionHandler stompExceptionHandler;
+    private final StompExceptionInterceptor stompExceptionInterceptor;
     private final String RABBITMQ_HOST;
 
     public WebBrokerSocketConfig(
             StompInboundInterceptor stompInboundInterceptor,
-            StompExceptionHandler stompExceptionHandler,
+            StompExceptionInterceptor stompExceptionInterceptor,
             @Value("${spring.rabbitmq.host}") String rabbitmqHost
     ) {
         this.stompInboundInterceptor = stompInboundInterceptor;
-        this.stompExceptionHandler = stompExceptionHandler;
+        this.stompExceptionInterceptor = stompExceptionInterceptor;
         this.RABBITMQ_HOST = rabbitmqHost;
     }
 
@@ -43,7 +44,7 @@ public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("http://127.0.0.1:8000") // 실제 환경에선 API 서버 도메인만 허용
                 .withSockJS(); // JS 라이브러리. 우린 iOS라서 안 씀. 테스트를 위해 허용
 
-        registry.setErrorHandler(stompExceptionHandler);
+        registry.setErrorHandler(stompExceptionInterceptor);
     }
 
     @Override
@@ -66,6 +67,7 @@ public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setClientLogin("jayang") // RabbitMQ 클라이언트 계정
                 .setClientPasscode("secret"); // RabbitMQ 클라이언트 비밀번호
 
+        config.setUserDestinationPrefix("/user"); // 유저별로 메시지를 구분하기 위한 프리픽스
         config.setPathMatcher(new AntPathMatcher(".")); // url을 chat/room/3 -> chat.room.3으로 참조하기 위한 설정
         config.setApplicationDestinationPrefixes("/pub"); // 클라이언트에서 메시지 송신 시 프리픽스
     }
