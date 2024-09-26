@@ -42,14 +42,7 @@ public class PreAuthorizeAspect {
         log.info("isAuthorized: {}", isAuthorized);
 
         if (!isAuthorized) {
-            // 사용자가 isAuthenticate()를 했다면 인증 실패, isAnonymouse()를 했다면 익명 실패 예외를 반환해야함.
-            if (preAuthorize.value().contains(PreAuthorizeSpELParser.SpELFunction.IS_AUTHENTICATED.getName())) {
-                log.warn("인증 실패: {}", principal);
-//                throw new PreAuthorizeErrorException(PreAuthorizeErrorCode.UNAUTHENTICATED);
-            } else if (preAuthorize.value().contains(PreAuthorizeSpELParser.SpELFunction.IS_ANONYMOUS.getName())) {
-                log.warn("익명 실패: {}", principal);
-//                throw new PreAuthorizeErrorException(PreAuthorizeErrorCode.UNANNOYMOUS);
-            }
+            handleUnauthorized(principal, preAuthorize);
         }
 
         return joinPoint.proceed();
@@ -67,5 +60,16 @@ public class PreAuthorizeAspect {
                 .map(arg -> (Principal) arg)
                 .findFirst()
                 .orElse(null);
+    }
+
+    private void handleUnauthorized(Principal principal, PreAuthorize preAuthorize) {
+        // 사용자가 isAuthenticate()를 했다면 인증 실패, isAnonymouse()를 했다면 익명 실패 예외를 반환해야함.
+        if (preAuthorize.value().contains(PreAuthorizeSpELParser.SpELFunction.IS_AUTHENTICATED.getName())) {
+            log.warn("인증 실패: {}", principal);
+//                throw new PreAuthorizeErrorException(PreAuthorizeErrorCode.UNAUTHENTICATED);
+        } else if (preAuthorize.value().contains(PreAuthorizeSpELParser.SpELFunction.IS_ANONYMOUS.getName())) {
+            log.warn("익명 실패: {}", principal);
+//                throw new PreAuthorizeErrorException(PreAuthorizeErrorCode.UNANNOYMOUS);
+        }
     }
 }

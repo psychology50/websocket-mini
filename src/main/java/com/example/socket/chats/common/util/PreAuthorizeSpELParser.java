@@ -25,7 +25,6 @@ import java.util.function.Supplier;
  */
 public class PreAuthorizeSpELParser {
     private static final ExpressionParser parser = new SpelExpressionParser();
-    private static final AuthenticationChecker authChecker = new AuthenticationChecker();
 
     /**
      * 주어진 SpEL 표현식을 평가합니다.
@@ -37,17 +36,7 @@ public class PreAuthorizeSpELParser {
      * @return 표현식 평가 결과 (true/false)
      */
     public static boolean evaluate(String expression, Principal principal, Method method, Object[] args, ApplicationContext applicationContext) {
-        System.out.println("expression: " + expression);
-
-//        AuthenticationChecker authChecker = new AuthenticationChecker();
-//        StandardEvaluationContext context = new StandardEvaluationContext(authChecker);
-
-        StandardEvaluationContext context = new StandardEvaluationContext();
-        createContext(context, principal, method, args, applicationContext);
-
-        System.out.println("StandardEvaluationContext: " + context.toString());
-        System.out.println("parseExpression: " + parser.parseExpression(expression).getValue(context, Boolean.class));
-
+        StandardEvaluationContext context = createContext(principal, method, args, applicationContext);
         return Boolean.TRUE.equals(parser.parseExpression(expression).getValue(context, Boolean.class));
     }
 
@@ -59,14 +48,11 @@ public class PreAuthorizeSpELParser {
      * @param args 메서드의 인자들
      * @return 생성된 StandardEvaluationContext
      */
-    private static void createContext(StandardEvaluationContext context, Principal principal, Method method, Object[] args, ApplicationContext applicationContext) {
+    private static StandardEvaluationContext createContext(Principal principal, Method method, Object[] args, ApplicationContext applicationContext) {
+        StandardEvaluationContext context = new StandardEvaluationContext();
+
         for (SpELFunction function : SpELFunction.values()) {
-            System.out.println("function: " + function.getName());
-
             try {
-                Method m = PreAuthorizeSpELParser.class.getDeclaredMethod(function.getMethodName(), function.getParameterTypes());
-                System.out.println("m: " + m.getName());
-
                 context.registerFunction(function.getName(),
                         PreAuthorizeSpELParser.class.getDeclaredMethod(function.getMethodName(), function.getParameterTypes()));
             } catch (NoSuchMethodException e) {
@@ -77,40 +63,13 @@ public class PreAuthorizeSpELParser {
         context.setVariable("principal", principal);
         context.setBeanResolver(new BeanFactoryResolver(applicationContext));
 
-//        // 매개변수 없는 람다 함수로 등록
-//        context.setVariable("isAnonymous", (Supplier<Boolean>) () -> isAnonymous(principal));
-//        context.setVariable("isAuthenticated", (Supplier<Boolean>) () -> isAuthenticated(principal));
-//        context.setVariable("permitAll", (Supplier<Boolean>) PreAuthorizeSpELParser::permitAll);
-
         Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
             context.setVariable(parameters[i].getName(), args[i]);
         }
-    }
 
-//    private static void createContext(StandardEvaluationContext context, Principal principal, Method method, Object[] args, ApplicationContext applicationContext) {
-//        for (SpELFunction function : SpELFunction.values()) {
-//            System.out.println("function: " + function.getName());
-//
-//            try {
-//                Method m = AuthenticationChecker.class.getDeclaredMethod(function.getMethodName(), function.getParameterTypes());
-//                System.out.println("m: " + m.getName());
-//
-//                context.registerFunction(function.getName(),
-//                        AuthenticationChecker.class.getDeclaredMethod(function.getMethodName(), function.getParameterTypes()));
-//            } catch (NoSuchMethodException e) {
-//                throw new RuntimeException("Error registering SpEL function: " + function.getName(), e);
-//            }
-//        }
-//
-//        context.setBeanResolver(new BeanFactoryResolver(applicationContext));
-//        context.setVariable("principal", principal);
-//
-//        Parameter[] parameters = method.getParameters();
-//        for (int i = 0; i < parameters.length; i++) {
-//            context.setVariable(parameters[i].getName(), args[i]);
-//        }
-//    }
+        return context;
+    }
 
     /**
      * 모든 사용자에게 접근을 허용합니다.
@@ -142,40 +101,6 @@ public class PreAuthorizeSpELParser {
             return userPrincipal.getExpiresAt().isAfter(LocalDateTime.now());
         }
         return false;
-    }
-
-    public static class AuthenticationChecker {
-        /**
-         * 모든 사용자에게 접근을 허용합니다.
-         *
-         * @return 언제나 true를 반환한다.
-         */
-        public static boolean permitAll() {
-            return true;
-        }
-
-        /**
-         * 주어진 Principal이 익명 사용자인지 확인합니다.
-         *
-         * @param principal 확인할 Principal 객체
-         * @return principal이 null이면 true, 그렇지 않으면 false
-         */
-        public boolean isAnonymous(Principal principal) {
-            return principal == null;
-        }
-
-        /**
-         * 주어진 Principal이 인증된 사용자인지 확인합니다.
-         *
-         * @param principal 확인할 Principal 객체
-         * @return 인증된 사용자이고 토큰이 만료되지 않았으면 true, 그렇지 않으면 false
-         */
-        public boolean isAuthenticated(Principal principal) {
-            if (principal instanceof UserPrincipal userPrincipal) {
-                return userPrincipal.getExpiresAt().isAfter(LocalDateTime.now());
-            }
-            return false;
-        }
     }
 
     /**
