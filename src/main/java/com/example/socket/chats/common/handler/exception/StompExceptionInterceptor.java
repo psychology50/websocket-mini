@@ -15,7 +15,7 @@ public interface StompExceptionInterceptor {
      * 해당 예외를 처리할 수 있는지 여부를 반환하는 메서드
      * @return true: 해당 예외를 처리할 수 있음, false: 해당 예외를 처리할 수 없음
      */
-    boolean canHandle(Throwable ex);
+    boolean canHandle(Throwable cause);
 
     /**
      * 예외를 처리하는 메서드.
@@ -23,11 +23,11 @@ public interface StompExceptionInterceptor {
      * 이를 원치 않는 경우, {@link StompCommand#ERROR}를 사용하여 Accessor를 설정해서는 안 된다.
      *
      * @param clientMessage {@link Message}: client로부터 받은 메시지
-     * @param ex Throwable: 발생한 예외
+     * @param cause Throwable: 발생한 예외
      * @return {@link Message}: client에게 보낼 최종 메시지
      */
     @Nullable
-    Message<byte[]> handle(@Nullable Message<byte[]> clientMessage, Throwable ex);
+    Message<byte[]> handle(@Nullable Message<byte[]> clientMessage, Throwable cause);
 
     /**
      * client로부터 받은 메시지의 HeaderAccessor에서 필요한 정보를 추출하는 편의용 메서드

@@ -1,5 +1,6 @@
 package com.example.socket.chats.config;
 
+import com.example.socket.chats.common.handler.exception.StompExceptionHandler;
 import com.example.socket.chats.common.interceptor.StompInboundInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,13 +23,16 @@ import reactor.netty.tcp.TcpClient;
 @EnableWebSocketMessageBroker
 public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final StompInboundInterceptor stompInboundInterceptor;
+    private final StompExceptionHandler stompExceptionHandler;
     private final String RABBITMQ_HOST;
 
     public WebBrokerSocketConfig(
             StompInboundInterceptor stompInboundInterceptor,
+            StompExceptionHandler stompExceptionHandler,
             @Value("${spring.rabbitmq.host}") String rabbitmqHost
     ) {
         this.stompInboundInterceptor = stompInboundInterceptor;
+        this.stompExceptionHandler = stompExceptionHandler;
         this.RABBITMQ_HOST = rabbitmqHost;
     }
 
@@ -39,7 +43,7 @@ public class WebBrokerSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("http://127.0.0.1:8000") // 실제 환경에선 API 서버 도메인만 허용
                 .withSockJS(); // JS 라이브러리. 우린 iOS라서 안 씀. 테스트를 위해 허용
 
-        registry.setErrorHandler();
+        registry.setErrorHandler(stompExceptionHandler);
     }
 
     @Override

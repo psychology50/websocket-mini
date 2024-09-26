@@ -146,8 +146,8 @@
             };
 
             const headers = {
-                Authorization: TokenManager.getAccessToken()
-                // Authorization: "Invalid Token"
+                // Authorization: TokenManager.getAccessToken()
+                Authorization: "Invalid Token"
             };
             stompClient.connect(headers, onConnected, onError);
         } catch (error) {
