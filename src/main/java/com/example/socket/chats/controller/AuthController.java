@@ -8,21 +8,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
 
 @Slf4j
-@Controller
+@Controller("chatAuthController")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
 
     @MessageMapping("auth.refresh")
-    @PreAuthorize("principal instanceof T(UserPrincipal)")
-    public void refreshPrincipal(@Header("Authorization") String token, Principal principal) {
+    @PreAuthorize("#principal instanceof T(UserPrincipal)")
+    public void refreshPrincipal(@Header("Authorization") String token, Principal principal, StompHeaderAccessor accessor) {
         log.info("refreshPrincipal AccessToken: {}", token);
 
-        authService.refreshPrincipal(token, (UserPrincipal) principal);
+        authService.refreshPrincipal(token, (UserPrincipal) principal, accessor);
     }
 }
