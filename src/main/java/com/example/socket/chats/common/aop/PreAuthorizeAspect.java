@@ -38,7 +38,7 @@ public class PreAuthorizeAspect {
         Principal principal = extractPrincipal(joinPoint.getArgs());
         log.info("principal: {}", principal);
 
-        boolean isAuthorized = PreAuthorizeSpELParser.evaluate(preAuthorize.value(), principal, method, joinPoint.getArgs(), applicationContext);
+        boolean isAuthorized = PreAuthorizeSpELParser.evaluate(preAuthorize.value(), method, joinPoint.getArgs(), applicationContext);
         log.info("isAuthorized: {}", isAuthorized);
 
         if (!isAuthorized) {
@@ -62,6 +62,12 @@ public class PreAuthorizeAspect {
                 .orElse(null);
     }
 
+    /**
+     * 인증/인가 실패 시 처리합니다.
+     *
+     * @param principal
+     * @param preAuthorize
+     */
     private void handleUnauthorized(Principal principal, PreAuthorize preAuthorize) {
         // 사용자가 isAuthenticate()를 했다면 인증 실패, isAnonymouse()를 했다면 익명 실패 예외를 반환해야함.
         if (preAuthorize.value().contains(PreAuthorizeSpELParser.SpELFunction.IS_AUTHENTICATED.getName())) {

@@ -50,26 +50,25 @@ public final class PreAuthorizeSpELParser {
      * 주어진 SpEL 표현식을 평가합니다.
      *
      * @param expression 평가할 SpEL 표현식
-     * @param principal 현재 사용자의 Principal 객체
      * @param method 평가 중인 메서드
      * @param args 메서드의 인자들
+     * @param applicationContext Spring의 ApplicationContext
      * @return 표현식 평가 결과 (true/false)
      */
-    public static synchronized boolean evaluate(String expression, Principal principal, Method method, Object[] args, ApplicationContext applicationContext) {
-        populateContext(principal, method, args, applicationContext);
+    public static synchronized boolean evaluate(String expression, Method method, Object[] args, ApplicationContext applicationContext) {
+        populateContext(method, args, applicationContext);
         return Boolean.TRUE.equals(parser.parseExpression(expression).getValue(context, Boolean.class));
     }
 
     /**
-     * SpEL 평가를 위한 컨텍스트를 생성합니다.
+     * SpEL 평가를 위해, 사용자의 Principal 객체와 메서드의 인자들을 EvaluationContext에 추가합니다.
      *
-     * @param principal 현재 사용자의 Principal 객체
      * @param method 평가 중인 메서드
      * @param args 메서드의 인자들
+     * @param applicationContext Spring의 ApplicationContext
      * @return 생성된 StandardEvaluationContext
      */
-    private static void populateContext(Principal principal, Method method, Object[] args, ApplicationContext applicationContext) {
-        context.setVariable("principal", principal);
+    private static void populateContext(Method method, Object[] args, ApplicationContext applicationContext) {
         context.setBeanResolver(new BeanFactoryResolver(applicationContext));
 
         Parameter[] parameters = method.getParameters();
