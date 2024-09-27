@@ -23,8 +23,28 @@ import java.util.function.Supplier;
  * @since 2024.09.26
  * @version 1.0.0
  */
-public class PreAuthorizeSpELParser {
+public final class PreAuthorizeSpELParser {
     private static final ExpressionParser parser = new SpelExpressionParser();
+    private static final StandardEvaluationContext context = new StandardEvaluationContext();
+
+    static {
+        initializeStaticContext();
+    }
+
+    private PreAuthorizeSpELParser() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static void initializeStaticContext() {
+        for (SpELFunction function : SpELFunction.values()) {
+            try {
+                context.registerFunction(function.getName(),
+                        PreAuthorizeSpELParser.class.getDeclaredMethod(function.getMethodName(), function.getParameterTypes()));
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException("Error registering SpEL function: " + function.getName(), e);
+            }
+        }
+    }
 
     /**
      * 주어진 SpEL 표현식을 평가합니다.
@@ -35,8 +55,8 @@ public class PreAuthorizeSpELParser {
      * @param args 메서드의 인자들
      * @return 표현식 평가 결과 (true/false)
      */
-    public static boolean evaluate(String expression, Principal principal, Method method, Object[] args, ApplicationContext applicationContext) {
-        StandardEvaluationContext context = createContext(principal, method, args, applicationContext);
+    public static synchronized boolean evaluate(String expression, Principal principal, Method method, Object[] args, ApplicationContext applicationContext) {
+        populateContext(principal, method, args, applicationContext);
         return Boolean.TRUE.equals(parser.parseExpression(expression).getValue(context, Boolean.class));
     }
 
@@ -48,18 +68,7 @@ public class PreAuthorizeSpELParser {
      * @param args 메서드의 인자들
      * @return 생성된 StandardEvaluationContext
      */
-    private static StandardEvaluationContext createContext(Principal principal, Method method, Object[] args, ApplicationContext applicationContext) {
-        StandardEvaluationContext context = new StandardEvaluationContext();
-
-        for (SpELFunction function : SpELFunction.values()) {
-            try {
-                context.registerFunction(function.getName(),
-                        PreAuthorizeSpELParser.class.getDeclaredMethod(function.getMethodName(), function.getParameterTypes()));
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException("Error registering SpEL function: " + function.getName(), e);
-            }
-        }
-
+    private static void populateContext(Principal principal, Method method, Object[] args, ApplicationContext applicationContext) {
         context.setVariable("principal", principal);
         context.setBeanResolver(new BeanFactoryResolver(applicationContext));
 
@@ -67,8 +76,6 @@ public class PreAuthorizeSpELParser {
         for (int i = 0; i < parameters.length; i++) {
             context.setVariable(parameters[i].getName(), args[i]);
         }
-
-        return context;
     }
 
     /**
