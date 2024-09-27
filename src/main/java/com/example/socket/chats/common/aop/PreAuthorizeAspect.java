@@ -1,6 +1,8 @@
 package com.example.socket.chats.common.aop;
 
 import com.example.socket.chats.common.annotation.PreAuthorize;
+import com.example.socket.chats.common.exception.PreAuthorizeErrorCode;
+import com.example.socket.chats.common.exception.PreAuthorizeErrorException;
 import com.example.socket.chats.common.util.PreAuthorizeSpELParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,13 +71,12 @@ public class PreAuthorizeAspect {
      * @param preAuthorize
      */
     private void handleUnauthorized(Principal principal, PreAuthorize preAuthorize) {
-        // 사용자가 isAuthenticate()를 했다면 인증 실패, isAnonymouse()를 했다면 익명 실패 예외를 반환해야함.
         if (preAuthorize.value().contains(PreAuthorizeSpELParser.SpELFunction.IS_AUTHENTICATED.getName())) {
             log.warn("인증 실패: {}", principal);
-//                throw new PreAuthorizeErrorException(PreAuthorizeErrorCode.UNAUTHENTICATED);
+            throw new PreAuthorizeErrorException(PreAuthorizeErrorCode.UNAUTHENTICATED);
         } else if (preAuthorize.value().contains(PreAuthorizeSpELParser.SpELFunction.IS_ANONYMOUS.getName())) {
             log.warn("익명 실패: {}", principal);
-//                throw new PreAuthorizeErrorException(PreAuthorizeErrorCode.UNANNOYMOUS);
+            throw new PreAuthorizeErrorException(PreAuthorizeErrorCode.NOT_ANONYMOUS);
         }
     }
 }

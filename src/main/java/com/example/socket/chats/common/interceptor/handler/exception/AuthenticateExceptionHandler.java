@@ -1,4 +1,4 @@
-package com.example.socket.chats.common.handler.exception;
+package com.example.socket.chats.common.interceptor.handler.exception;
 
 import com.example.socket.chats.dto.ErrorMessage;
 import com.example.socket.infra.common.exception.JwtErrorException;

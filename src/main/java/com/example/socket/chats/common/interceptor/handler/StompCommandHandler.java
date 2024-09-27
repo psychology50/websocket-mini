@@ -1,4 +1,4 @@
-package com.example.socket.chats.common.handler;
+package com.example.socket.chats.common.interceptor.handler;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;

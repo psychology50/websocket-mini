@@ -1,6 +1,6 @@
 package com.example.socket.chats.common.interceptor;
 
-import com.example.socket.chats.common.handler.exception.StompExceptionHandler;
+import com.example.socket.chats.common.interceptor.handler.exception.StompExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;

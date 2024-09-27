@@ -1,6 +1,7 @@
-package com.example.socket.chats.common.handler.exception;
+package com.example.socket.chats.common.interceptor.handler.exception;
 
 import com.example.socket.chats.dto.ErrorMessage;
+import com.example.socket.config.exception.GlobalErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -27,8 +28,16 @@ public class WebSocketGlobalExceptionHandler {
     private final SimpMessagingTemplate template;
     private static final String ERROR_DESTINATION = "/queue/errors";
 
+    @MessageExceptionHandler(GlobalErrorException.class)
+    public void handleGlobalErrorException(Principal principal, GlobalErrorException ex) {
+        ErrorMessage errorMessage = ErrorMessage.of(ex.causedBy().getCode(), ex.getBaseErrorCode().getExplainError());
+        log.error("handleGlobalErrorException: {}", errorMessage);
+
+        template.convertAndSendToUser(principal.getName(), ERROR_DESTINATION, errorMessage);
+    }
+
     @MessageExceptionHandler(RuntimeException.class)
-    public void handleRuntimeException(Principal principal, RuntimeException ex, @Payload Message<byte[]> message, StompHeaderAccessor accessor) {
+    public void handleRuntimeException(Principal principal, RuntimeException ex) {
         ErrorMessage errorMessage = ErrorMessage.of("5000", ex.getMessage());
         log.error("handleRuntimeException: {}", errorMessage);
 

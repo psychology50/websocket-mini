@@ -1,4 +1,4 @@
-package com.example.socket.chats.common.handler;
+package com.example.socket.chats.common.interceptor.handler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

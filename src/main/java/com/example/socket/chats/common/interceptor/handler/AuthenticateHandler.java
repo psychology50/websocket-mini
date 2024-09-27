@@ -1,6 +1,6 @@
-package com.example.socket.chats.common.handler;
+package com.example.socket.chats.common.interceptor.handler;
 
-import com.example.socket.chats.common.handler.marker.ConnectCommandHandler;
+import com.example.socket.chats.common.interceptor.handler.marker.ConnectCommandHandler;
 import com.example.socket.chats.common.security.jwt.access.AccessTokenClaimKeys;
 import com.example.socket.chats.common.security.jwt.access.AccessTokenProvider;
 import com.example.socket.chats.common.security.principle.UserPrincipal;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @Component

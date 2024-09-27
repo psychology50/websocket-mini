@@ -1,4 +1,4 @@
-package com.example.socket.chats.common.handler.exception;
+package com.example.socket.chats.common.interceptor.handler.exception;
 
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;

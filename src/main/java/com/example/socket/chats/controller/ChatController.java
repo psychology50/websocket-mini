@@ -18,7 +18,8 @@ public class ChatController {
     private final ChatMessageProducer chatMessageProducer;
 
     @MessageMapping("chat.message.{roomId}")
-    @PreAuthorize("#isAuthenticated(#principal)")
+//    @PreAuthorize("#isAuthenticated(#principal)")
+    @PreAuthorize("#isAnonymous(#principal)")
     public void sendMessage(@DestinationVariable String roomId, ChatMessage message, Principal principal) {
         chatMessageProducer.sendMessage(message);
     }

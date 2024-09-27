@@ -1,6 +1,6 @@
-package com.example.socket.chats.common.handler;
+package com.example.socket.chats.common.interceptor.handler;
 
-import com.example.socket.chats.common.handler.marker.SubscribeCommandHandler;
+import com.example.socket.chats.common.interceptor.handler.marker.SubscribeCommandHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;

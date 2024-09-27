@@ -34,7 +34,7 @@ public class PreAuthorizeSpELParserTest {
                     String expression = index % 2 == 0 ? "#isAnonymous(#principal)" : "#isAuthenticated(#principal)";
                     Object[] args = new Object[]{"principal"};
 
-                    boolean result = PreAuthorizeSpELParser.evaluate(expression, principal, testMethod, args, applicationContext);
+                    boolean result = PreAuthorizeSpELParser.evaluate(expression, testMethod, args, applicationContext);
 
                     if ((index % 2 == 0 && result) || (index % 2 != 0 && result)) {
                         successCount.incrementAndGet();
