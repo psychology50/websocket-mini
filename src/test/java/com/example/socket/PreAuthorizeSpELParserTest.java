@@ -1,6 +1,6 @@
 package com.example.socket;
 
-import com.example.socket.chats.common.security.principle.UserPrincipal;
+import com.example.socket.chats.common.security.principal.UserPrincipal;
 import com.example.socket.chats.common.util.PreAuthorizeSpELParser;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.support.GenericApplicationContext;

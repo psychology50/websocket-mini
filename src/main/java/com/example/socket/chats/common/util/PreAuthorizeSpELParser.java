@@ -1,9 +1,8 @@
 package com.example.socket.chats.common.util;
 
-import com.example.socket.chats.common.security.principle.UserPrincipal;
+import com.example.socket.chats.common.security.principal.UserPrincipal;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.expression.BeanFactoryResolver;
-import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -12,7 +11,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
 
 /**
  * WebSocket 인증 및 인가를 위한 Spring Expression Language (SpEL) 파서.

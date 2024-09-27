@@ -2,7 +2,7 @@ package com.example.socket.chats.controller;
 
 import com.example.socket.chats.common.annotation.PreAuthorize;
 import com.example.socket.chats.dto.ChatMessage;
-import com.example.socket.chats.producer.ChatMessageProducer;
+import com.example.socket.chats.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -15,13 +15,12 @@ import java.security.Principal;
 @Controller
 @RequiredArgsConstructor
 public class ChatController {
-    private final ChatMessageProducer chatMessageProducer;
+    private final ChatMessageService chatMessageService;
 
     @MessageMapping("chat.message.{roomId}")
-//    @PreAuthorize("#isAuthenticated(#principal)")
-    @PreAuthorize("#isAnonymous(#principal)")
+    @PreAuthorize("#isAuthenticated(#principal)") // forbidden처리 된 access token으로 접근하면?
     public void sendMessage(@DestinationVariable String roomId, ChatMessage message, Principal principal) {
-        chatMessageProducer.sendMessage(message);
+        chatMessageService.sendMessage(message);
     }
 
     @MessageMapping("chat.message.exception")

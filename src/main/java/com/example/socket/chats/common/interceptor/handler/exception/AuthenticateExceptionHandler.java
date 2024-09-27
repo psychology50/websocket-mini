@@ -1,6 +1,6 @@
 package com.example.socket.chats.common.interceptor.handler.exception;
 
-import com.example.socket.chats.dto.ErrorMessage;
+import com.example.socket.chats.dto.ServerSideMessage;
 import com.example.socket.infra.common.exception.JwtErrorException;
 import com.example.socket.infra.common.jwt.JwtErrorCodeUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,23 +28,23 @@ public class AuthenticateExceptionHandler implements StompExceptionHandler {
     public Message<byte[]> handle(Message<byte[]> clientMessage, Throwable cause) {
         StompHeaderAccessor errorHeaderAccessor = StompHeaderAccessor.create(StompCommand.ERROR);
 
-        ErrorMessage errorMessage = null;
+        ServerSideMessage serverSideMessage = null;
         if (cause instanceof JwtErrorException ex) {
             JwtErrorException jwtErrorException = JwtErrorCodeUtil.determineAuthErrorException(ex);
             log.error("[인증 예외] {}", jwtErrorException.getErrorCode().getMessage());
 
             errorHeaderAccessor.setMessage(jwtErrorException.getErrorCode().causedBy().getCode());
             errorHeaderAccessor.setLeaveMutable(true);
-            errorMessage = ErrorMessage.of(jwtErrorException.getErrorCode().getExplainError());
+            serverSideMessage = ServerSideMessage.of(jwtErrorException.getErrorCode().getExplainError());
         }
 
         extractClientHeaderAccessor(clientMessage, errorHeaderAccessor);
         errorHeaderAccessor.setImmutable();
 
-        return createMessage(errorHeaderAccessor, errorMessage);
+        return createMessage(errorHeaderAccessor, serverSideMessage);
     }
 
-    private Message<byte[]> createMessage(StompHeaderAccessor errorHeaderAccessor, ErrorMessage errorPayload) {
+    private Message<byte[]> createMessage(StompHeaderAccessor errorHeaderAccessor, ServerSideMessage errorPayload) {
         if (errorPayload == null) {
             return MessageBuilder.createMessage(EMPTY_PAYLOAD, errorHeaderAccessor.getMessageHeaders());
         }

@@ -1,4 +1,4 @@
-package com.example.socket.chats.common.security.principle;
+package com.example.socket.chats.common.security.principal;
 
 import com.example.socket.domains.user.domain.User;
 import com.example.socket.domains.user.type.Role;
@@ -39,6 +39,14 @@ public class UserPrincipal implements Principal {
                 .isChatNotify(user.getNotifySetting().isChatNotify())
                 .expiresAt(expiresAt)
                 .build();
+    }
+
+    public void updateExpiresAt(LocalDateTime expiresAt) {
+        if (expiresAt.isBefore(this.expiresAt)) {
+            throw new IllegalArgumentException("만료 시간을 줄일 수 없습니다.");
+        }
+
+        this.expiresAt = expiresAt;
     }
 
     @Override

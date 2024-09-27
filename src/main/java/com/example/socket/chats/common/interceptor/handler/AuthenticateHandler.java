@@ -3,7 +3,7 @@ package com.example.socket.chats.common.interceptor.handler;
 import com.example.socket.chats.common.interceptor.handler.marker.ConnectCommandHandler;
 import com.example.socket.chats.common.security.jwt.access.AccessTokenClaimKeys;
 import com.example.socket.chats.common.security.jwt.access.AccessTokenProvider;
-import com.example.socket.chats.common.security.principle.UserPrincipal;
+import com.example.socket.chats.common.security.principal.UserPrincipal;
 import com.example.socket.domains.user.domain.User;
 import com.example.socket.domains.user.service.UserService;
 import com.example.socket.infra.common.exception.JwtErrorCode;

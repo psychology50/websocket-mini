@@ -61,26 +61,6 @@
         }
     }
 
-    // Token Refresh
-    async function refreshToken() {
-        try {
-            const response = await fetch(`${API_URL}/api/auth/refresh`, {
-                method: 'GET',
-                credentials: 'include'
-            });
-            if (response.ok) {
-                console.log("[Refresh Token] : " + response.headers.get('Authorization'));
-
-                TokenManager.setAccessToken(response.headers.get('Authorization'));
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error('Token refresh failed:', error);
-            return false;
-        }
-    }
-
     // Login Function
     async function login() {
         const userId = document.getElementById('userId').value;
@@ -99,8 +79,8 @@
             if (response.ok) {
                 TokenManager.setAccessToken(response.headers.get('authorization'));
 
-                showChatSection();
                 connectWebSocket();
+                showChatSection();
             } else {
                 document.getElementById('loginError').textContent = 'Login failed';
             }
@@ -172,8 +152,31 @@
 
     function onConnected(frame) {
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/sub/chat.room.1', onMessageReceived, {'auto-delete':true, 'durable':false, 'exclusive':false});
-        stompClient.subscribe('/user/queue/errors', onErrorReceived);
+        stompClient.subscribe('/sub/chat.room.1', onMessageReceived, {'auto-delete':true, 'durable':false, 'exclusive':false}); // Message Subscription
+        stompClient.subscribe('/user/queue/errors', onErrorReceived); // Error Handling
+        stompClient.subscribe('/user/auth', refresh); // Token Refresh
+    }
+
+    // Token Refresh
+    const refresh = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/auth/refresh`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                console.log("[Refresh Token] : " + response.headers.get('Authorization'));
+
+                TokenManager.setAccessToken(response.headers.get('Authorization'));
+
+                const receiptId = 'receipt-' + Date.now();
+                stompClient.send("/pub/auth.refresh", {'Authorization': TokenManager.getAccessToken(), 'receipt': TokenManager.getAccessToken()}); // /pub가 맞나?
+                // receiptId를 통해 해당 메시지 처리
+            }
+        } catch (error) {
+            console.error('Token refresh failed:', error);
+        }
     }
 
     function onError(error) {
@@ -199,6 +202,8 @@
         console.log('Received error:', error);
     }
 
+    const refresh =
+
     function sendMessage() {
         const roomId = document.getElementById('roomId').value;
         const content = document.getElementById('message').value;
@@ -206,10 +211,6 @@
             'roomId': roomId,
             'content': content
         }));
-        // stompClient.send("/pub/chat.message.exception", {'Authorization': TokenManager.getAccessToken()}, JSON.stringify({
-        //     'roomId': roomId,
-        //     'content': content
-        // }));
     }
 
     function showMessage(message) {
