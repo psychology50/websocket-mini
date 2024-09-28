@@ -33,5 +33,6 @@ services:
       - "8000:80"
     volumes:
       - ./proxy/test.conf:/etc/nginx/conf.d/default.conf
+      - ./src/main/resources/static:/usr/share/nginx/html
     extra_hosts:
       - "host.docker,internal:host-gateway"

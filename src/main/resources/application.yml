@@ -2,6 +2,10 @@ spring:
   application:
     name: socket-server
 
+  web:
+    resources:
+      static-locations: classpath:/static/
+
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3300/socket?serverTimezone=Asia/Seoul&characterEncoding=utf8&postfileSQL=true&logger=Slf4JLogger&rewriteBatchedStatements=true}
     username: ${DB_USER_NAME:root}
