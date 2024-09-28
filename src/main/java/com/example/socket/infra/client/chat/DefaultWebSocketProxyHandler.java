@@ -17,7 +17,7 @@ public class DefaultWebSocketProxyHandler implements WebSocketProxyHandler {
 
     @Override
     public WebSocket.Url getWebSocketServerUrl(HttpServletRequest request, HttpHeaders headers) {
-        return new WebSocket.Url("http://localhost:8000/chat");
+        return new WebSocket.Url("ws://localhost:8000/chat");
     }
 //
 //    @Override
