@@ -20,9 +20,12 @@ public class AuthController {
     private final AuthService authService;
 
     @MessageMapping("auth.refresh")
-    @PreAuthorize("#principal instanceof T(UserPrincipal)")
+    @PreAuthorize("#principal instanceof T(com.example.socket.chats.common.security.principal.UserPrincipal)")
     public void refreshPrincipal(@Header("Authorization") String token, Principal principal, StompHeaderAccessor accessor) {
         log.info("refreshPrincipal AccessToken: {}", token);
+
+        // token 앞의 "Bearer " 제거
+        token = token.substring(7);
 
         authService.refreshPrincipal(token, (UserPrincipal) principal, accessor);
     }

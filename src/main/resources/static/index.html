@@ -170,9 +170,9 @@
                 TokenManager.setAccessToken(response.headers.get('Authorization'));
 
                 const receiptId = 'receipt-' + Date.now();
-                stompClient.send("/pub/auth.refresh", {'Authorization': TokenManager.getAccessToken(), 'receipt': TokenManager.getAccessToken()}, (message) => {
+                stompClient.send("/pub/auth.refresh", {'Authorization': TokenManager.getAccessToken(), 'receipt': receiptId}, (message) => {
                     console.log("Message : " + JSON.parse(message.body));
-                }); // /pub가 맞나?
+                });
             }
         } catch (error) {
             console.error('Token refresh failed:', error);
@@ -202,7 +202,7 @@
         console.log('Received error:', error);
 
         // header message가 401로 시작하면
-        if (error.headers && error.headers.message.startsWith('401')) {
+        if (error['code'] === '4011') {
             refresh().then(success => {
                 if (success) {
                     connectWebSocket();

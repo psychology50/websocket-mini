@@ -70,7 +70,7 @@ public class AuthController {
     ) {
         JwtClaims claims = refreshTokenProvider.getJwtClaimsFromToken(refreshToken);
 
-        Long userId = JwtClaimsParserUtil.getClaimsValue(claims, "userId", Long::parseLong);
+        Long userId = JwtClaimsParserUtil.getClaimsValue(claims, "id", Long::parseLong);
         String role = JwtClaimsParserUtil.getClaimsValue(claims, "role", String.class);
 
         String newAccessToken = accessTokenProvider.generateToken(AccessTokenClaim.of(userId, role));
