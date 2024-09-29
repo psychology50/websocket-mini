@@ -1,4 +1,5 @@
 export const showMessage = (message) => {
+    console.log("📩 [Show Message]:", message);
     const messageElement = document.createElement('div');
     messageElement.appendChild(document.createTextNode(message));
     document.getElementById('messages').appendChild(messageElement);

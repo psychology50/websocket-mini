@@ -9,7 +9,7 @@ let stompClient = null;
 export const connectWebSocket = async () => {
     try {
         const url = await getSocketServerUrl();
-        console.log("Connecting to:", url);
+        console.log("🟢 Connecting to:", url);
 
         stompClient = new Client({
             brokerURL: url,
@@ -38,6 +38,7 @@ export const sendMessage = (roomId, content) => {
             'content': content
         })
     });
+    console.log('📤 [Send Message]: ', content);
 }
 
 export const refresh = async () => {
@@ -66,7 +67,7 @@ export const refresh = async () => {
         }
         return true;
     } catch (error) {
-        console.error('Token refresh failed:', error);
+        console.error('🔴 [webSocketService.refresh()] Token refresh failed:', error);
         return false
     }
 }
@@ -91,7 +92,7 @@ const onError = (error) => {
 }
 
 function onMessageReceived(message) {
-    console.log('Received:', message);
+    console.log('📩 [webSocketService.onMessageReceived] Received:', message);
     // UI 업데이트는 main.js에서 처리
     window.dispatchEvent(new CustomEvent('newMessage', { detail: JSON.parse(message.body) }));
 }
