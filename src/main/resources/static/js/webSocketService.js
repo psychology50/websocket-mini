@@ -59,8 +59,8 @@ export const refresh = async () => {
             });
 
             return new Promise((resolve) => { // receiptId로 서버로 부터 응답받은 메시지 열어보는 방법? 자꾸 여기서 한 텀 쉬는 문제
-                stompClient.watchForReceipt(receiptId, () => {
-                    console.log('💡 [Token refresh confirmed]');
+                stompClient.watchForReceipt(receiptId, (response) => { // 원래는 여기서 response body의 code에 따라 성공 실패 처리해야 함
+                    console.log('🔄 [Token refresh confirmed] : ' + response);
                     resolve(true);
                 });
             });
