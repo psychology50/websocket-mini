@@ -8,6 +8,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ChatRoomService {
     public boolean isExists(Long chatRoomId, Long userId) {
-        return true; // 일단 무조건 허용.
+        return false; // 일단 무조건 허용.
     }
 }

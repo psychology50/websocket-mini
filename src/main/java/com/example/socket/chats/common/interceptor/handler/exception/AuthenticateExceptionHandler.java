@@ -1,5 +1,6 @@
 package com.example.socket.chats.common.interceptor.handler.exception;
 
+import com.example.socket.chats.common.interceptor.handler.AbstractStompExceptionHandler;
 import com.example.socket.chats.dto.ServerSideMessage;
 import com.example.socket.infra.common.exception.JwtErrorException;
 import com.example.socket.infra.common.jwt.JwtErrorCodeUtil;
@@ -14,10 +15,10 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class AuthenticateExceptionHandler implements StompExceptionHandler {
-    private final ObjectMapper objectMapper;
-    private static final byte[] EMPTY_PAYLOAD = new byte[0];
+public class AuthenticateExceptionHandler extends AbstractStompExceptionHandler {
+    public AuthenticateExceptionHandler(ObjectMapper objectMapper) {
+        super(objectMapper);
+    }
 
     @Override
     public boolean canHandle(Throwable cause) {
@@ -25,36 +26,17 @@ public class AuthenticateExceptionHandler implements StompExceptionHandler {
     }
 
     @Override
-    public Message<byte[]> handle(Message<byte[]> clientMessage, Throwable cause) {
-        StompHeaderAccessor errorHeaderAccessor = StompHeaderAccessor.create(StompCommand.ERROR);
-
-        ServerSideMessage serverSideMessage = null;
-        if (cause instanceof JwtErrorException ex) {
-            JwtErrorException jwtErrorException = JwtErrorCodeUtil.determineAuthErrorException(ex);
-            log.error("[인증 예외] {}", jwtErrorException.getErrorCode().getMessage());
-
-            errorHeaderAccessor.setMessage(jwtErrorException.getErrorCode().causedBy().getCode());
-            errorHeaderAccessor.setLeaveMutable(true);
-            serverSideMessage = ServerSideMessage.of(jwtErrorException.getErrorCode().getExplainError());
-        }
-
-        extractClientHeaderAccessor(clientMessage, errorHeaderAccessor);
-        errorHeaderAccessor.setImmutable();
-
-        return createMessage(errorHeaderAccessor, serverSideMessage);
+    protected StompCommand getStompCommand() {
+        return StompCommand.ERROR;
     }
 
-    private Message<byte[]> createMessage(StompHeaderAccessor errorHeaderAccessor, ServerSideMessage errorPayload) {
-        if (errorPayload == null) {
-            return MessageBuilder.createMessage(EMPTY_PAYLOAD, errorHeaderAccessor.getMessageHeaders());
-        }
+    @Override
+    protected ServerSideMessage getServerSideMessage(Throwable cause) {
+        JwtErrorException ex = (JwtErrorException) cause;
+        ex = JwtErrorCodeUtil.determineAuthErrorException(ex);
 
-        try {
-            byte[] payload = objectMapper.writeValueAsBytes(errorPayload);
-            return MessageBuilder.createMessage(payload, errorHeaderAccessor.getMessageHeaders());
-        } catch (Exception e) {
-            log.error("[인증 예외] 에러 메시지 생성 중 오류가 발생했습니다.", e);
-            return MessageBuilder.createMessage(EMPTY_PAYLOAD, errorHeaderAccessor.getMessageHeaders());
-        }
+        log.warn("[인증 예외] {}", ex.getErrorCode().getMessage());
+
+        return ServerSideMessage.of(ex.getErrorCode().getExplainError());
     }
 }

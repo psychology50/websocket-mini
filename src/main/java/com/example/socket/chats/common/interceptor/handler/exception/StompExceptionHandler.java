@@ -30,19 +30,20 @@ public interface StompExceptionHandler {
     Message<byte[]> handle(@Nullable Message<byte[]> clientMessage, Throwable cause);
 
     /**
-     * client로부터 받은 메시지의 HeaderAccessor에서 필요한 정보를 추출하는 편의용 메서드
-     * 기본으로는 receiptId만을 추출하도록 구현되어 있으며, 필요한 정보가 있다면 해당 메서드를 구현하여 사용한다.
+     * 클라이언트 메시지에서 필요한 헤더 정보를 추출하여 새로운 StompHeaderAccessor에 설정합니다.
+     * 기본적으로 receiptId를 추출합니다. 하위 클래스에서 필요에 따라 재정의할 수 있습니다.
      *
-     * @param clientMessage {@link Message}: client로부터 받은 메시지
-     * @param errorHeaderAccessor {@link StompHeaderAccessor}: client에게 보낼 메시지를 생성하기 위한 errorHeaderAccessor
+     * @param clientMessage 클라이언트로부터 받은 원본 메시지 (null일 수 있음)
+     * @param accessor 새로 생성된 StompHeaderAccessor
      */
-    default void extractClientHeaderAccessor(@NonNull Message<byte[]> clientMessage, @NonNull StompHeaderAccessor errorHeaderAccessor) {
-        StompHeaderAccessor clientHeaderAccessor = MessageHeaderAccessor.getAccessor(clientMessage, StompHeaderAccessor.class);
-
-        if (clientHeaderAccessor != null) {
-            String receiptId = clientHeaderAccessor.getReceipt();
-            if (receiptId != null) {
-                errorHeaderAccessor.setReceiptId(receiptId);
+    default void extractClientHeaderAccessor(Message<?> clientMessage, StompHeaderAccessor accessor) {
+        if (clientMessage != null) {
+            StompHeaderAccessor clientHeaderAccessor = MessageHeaderAccessor.getAccessor(clientMessage, StompHeaderAccessor.class);
+            if (clientHeaderAccessor != null) {
+                String receiptId = clientHeaderAccessor.getReceipt();
+                if (receiptId != null) {
+                    accessor.setReceiptId(receiptId);
+                }
             }
         }
     }
