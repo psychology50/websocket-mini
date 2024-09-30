@@ -32,6 +32,7 @@ public class ReceiptEventHandler {
 
             byte[] payload = new byte[0];
             try {
+                log.info("message.getPayload(): {}", message.getPayload());
                 payload = objectMapper.writeValueAsBytes(message.getPayload());
             } catch (JsonProcessingException e) {
                 e.printStackTrace();

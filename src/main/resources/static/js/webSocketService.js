@@ -52,16 +52,55 @@ export const refresh = async () => {
             TokenManager.setAccessToken(response.headers.get('Authorization'));
 
             const receiptId = 'receipt-' + Date.now();
-            stompClient.publish({
-                destination: "/pub/auth.refresh",
-                headers: {'Authorization': TokenManager.getAccessToken(), 'receipt': receiptId},
-                body: JSON.stringify({accessToken: TokenManager.getAccessToken()})
-            });
 
-            return new Promise((resolve) => { // receiptId로 서버로 부터 응답받은 메시지 열어보는 방법? 자꾸 여기서 한 텀 쉬는 문제
-                stompClient.watchForReceipt(receiptId, (response) => { // 원래는 여기서 response body의 code에 따라 성공 실패 처리해야 함
-                    console.log('🔄 [Token refresh confirmed] : ' + response);
-                    resolve(true);
+            return new Promise((resolve, reject) => {
+                stompClient.watchForReceipt(receiptId, (frame) => { // publish 하기 전에 watchForReceipt로 응답을 기다려야 함
+                    console.log('🔄 [Token refresh confirmed] frame:', frame);
+                    console.log('🟢 [Token refresh confirmed] headers:', frame.headers);
+                    console.log('🟢 [Token refresh confirmed] raw body:', frame.body);
+
+                    // frame.body 뒤에 " MESSAGE\n" 문자열이 붙어 있어서 JSON.parse() 시 에러 발생
+                    // 따라서, frame.body를 JSON.parse() 하기 전에 문자열 뒤의 " MESSAGE\n" 문자열을 제거
+                    // try {
+                    //     const serverMessage = JSON.parse(frame.body.replace(' MESSAGE\n', ''));
+                    //     if (serverMessage.code === '2000') { // 성공 코드 확인
+                    //         resolve(true); // 성공 시
+                    //     } else {
+                    //         resolve(false); // 실패 시
+                    //     }
+                    // } catch (error) {
+                    //     console.error('🔴 Failed to parse receipt body:', error);
+                    //     resolve(false); // 실패 시
+                    // }
+
+                    try {
+                        // JSON 부분만 추출 (body 출력해보면 json 뒤에 온갖 메타데이터가 붙어있음)
+                        const jsonMatch = frame.body.match(/\{.*\}/);
+                        if (jsonMatch) {
+                            const jsonStr = jsonMatch[0];
+                            console.log('🟢 [Token refresh confirmed] Extracted JSON:', jsonStr);
+                            const serverMessage = JSON.parse(jsonStr);
+                            console.log('🟢 [Token refresh confirmed] Parsed message:', serverMessage);
+
+                            if (serverMessage.code === '2000') {
+                                resolve(true);
+                            } else {
+                                resolve(false);
+                            }
+                        } else {
+                            console.error('No JSON found in the frame body');
+                            resolve(false);
+                        }
+                    } catch (error) {
+                        console.error('🔴 Failed to parse receipt body:', error);
+                        resolve(false);
+                    }
+                });
+
+                stompClient.publish({
+                    destination: "/pub/auth.refresh",
+                    headers: {'Authorization': TokenManager.getAccessToken(), 'receipt': receiptId},
+                    body: JSON.stringify({accessToken: TokenManager.getAccessToken()})
                 });
             });
         }
