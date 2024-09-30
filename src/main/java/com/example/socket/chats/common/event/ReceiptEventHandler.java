@@ -1,5 +1,6 @@
 package com.example.socket.chats.common.event;
 
+import com.example.socket.chats.dto.ServerSideMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.CompletableFuture;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -24,10 +27,10 @@ public class ReceiptEventHandler {
     @Bean
     @Async
     @EventListener
-    public ApplicationListener<RefreshEvent> handleRefreshEvent(final AbstractSubscribableChannel clientOutboundChannel) {
-        return event -> {
+    public CompletableFuture<ApplicationListener<RefreshEvent<ServerSideMessage>>> handleRefreshEvent(final AbstractSubscribableChannel clientOutboundChannel) {
+        return CompletableFuture.completedFuture(event -> {
             log.info("handleRefreshEvent: {}", event);
-            Message<byte[]> message = event.getMessage();
+            Message<ServerSideMessage> message = event.getMessage();
             StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
             byte[] payload = new byte[0];
@@ -38,7 +41,7 @@ public class ReceiptEventHandler {
                 e.printStackTrace();
             }
 
-            if (accessor.getReceipt() != null) {
+            if (accessor != null && accessor.getReceipt() != null) {
                 accessor.setHeader("stompCommand", StompCommand.RECEIPT);
                 accessor.setReceiptId(accessor.getReceipt());
 
@@ -47,6 +50,6 @@ public class ReceiptEventHandler {
 
                 clientOutboundChannel.send(receiptMessage);
             }
-        };
+        });
     }
 }
