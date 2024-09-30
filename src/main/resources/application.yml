@@ -2,6 +2,7 @@ spring:
   application:
     name: socket-server
 
+
   web:
     resources:
       static-locations: classpath:/static/
@@ -59,6 +60,8 @@ spring:
           enabled: true
         response:
           enabled: true
+  main:
+    allow-bean-definition-overriding: true
 
 rabbitmq:
   chat-queue:

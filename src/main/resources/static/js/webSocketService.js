@@ -113,8 +113,8 @@ export const refresh = async () => {
 
 const onConnected = (frame) => {
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/sub/chat.room.1', onMessageReceived); // Message Subscription
-    stompClient.subscribe('/user/queue/errors', onErrorReceived); // Error Handling
+    stompClient.subscribe('/sub/chat.room.1', {}, onMessageReceived); // Message Subscription
+    stompClient.subscribe('/user/queue/errors', {}, onErrorReceived); // Error Handling
 }
 
 const onError = (error) => {
