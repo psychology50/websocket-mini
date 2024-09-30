@@ -19,16 +19,17 @@ public class StompExceptionInterceptor extends StompSubProtocolErrorHandler {
     @Override
     @Nullable
     public Message<byte[]> handleClientMessageProcessingError(@Nullable Message<byte[]> clientMessage, Throwable ex) {
+        log.warn("STOMP client message processing error: {}", clientMessage);
         Throwable cause = ex.getCause();
 
         for (StompExceptionHandler interceptor : interceptors) {
             if (interceptor.canHandle(cause)) {
-                log.error("STOMP client message processing error", cause);
+                log.warn("STOMP client message processing throw({}) catch handler {}", cause.getMessage(), interceptor);
                 return interceptor.handle(clientMessage, cause);
             }
         }
 
-        log.error("STOMP client message processing error", ex);
+        log.error("STOMP client message processing error: {}", ex.getMessage());
         return super.handleClientMessageProcessingError(clientMessage, ex);
     }
 }

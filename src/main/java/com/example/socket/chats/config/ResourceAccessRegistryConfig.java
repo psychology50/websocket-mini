@@ -15,7 +15,7 @@ public class ResourceAccessRegistryConfig {
     public ResourceAccessRegistry configureResourceAccess() {
         ResourceAccessRegistry registry = new ResourceAccessRegistry();
 
-        registry.registerChecker("^/sub/chat\\.exchange/chat\\.room\\.\\d+$", chatRoomChecker);
+        registry.registerChecker("^/sub/chat\\.room\\.\\d+$", chatRoomChecker);
 
         return registry;
     }

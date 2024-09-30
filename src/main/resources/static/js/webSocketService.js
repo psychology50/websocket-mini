@@ -113,8 +113,23 @@ export const refresh = async () => {
 
 const onConnected = (frame) => {
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/sub/chat.room.1', {}, onMessageReceived); // Message Subscription
-    stompClient.subscribe('/user/queue/errors', {}, onErrorReceived); // Error Handling
+
+    let chatRoomReceiptId = 'chat-room-receipt-' + Date.now();
+    let errorReceiptId = 'error-receipt-' + Date.now();
+
+    stompClient.watchForReceipt(chatRoomReceiptId, (frame) => {
+        console.log('🟢 [Chat Room Subscription] frame:', frame);
+        console.log('🟢 [Chat Room Subscription] headers:', frame.headers);
+        console.log('🟢 [Chat Room Subscription] raw body:', frame.body);
+    });
+    stompClient.watchForReceipt(errorReceiptId, (frame) => {
+        console.log('🟢 [Error Subscription] frame:', frame);
+        console.log('🟢 [Error Subscription] headers:', frame.headers);
+        console.log('🟢 [Error Subscription] raw body:', frame.body);
+    });
+
+    stompClient.subscribe('/sub/chat.room.1', onMessageReceived, {'receipt': chatRoomReceiptId}); // Message Subscription
+    stompClient.subscribe('/user/queue/errors', onErrorReceived, {'receipt': errorReceiptId}); // Error Handling
 }
 
 const onError = (error) => {

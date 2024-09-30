@@ -17,8 +17,9 @@ import org.springframework.stereotype.Component;
 public class ChatExchangeAuthorizeHandler implements SubscribeCommandHandler {
     private static final String REQUEST_EXCHANGE_PREFIX = "/sub/";
     private static final String CONVERTED_EXCHANGE_PREFIX = "/exchange/chat.exchange/";
+    private static final String PRIVATE_EXCHANGE_PREFIX = "/user/";
 
-    private ResourceAccessRegistry resourceAccessRegistry;
+    private final ResourceAccessRegistry resourceAccessRegistry;
 
     @Override
     public boolean isSupport(StompCommand command) {
@@ -28,17 +29,22 @@ public class ChatExchangeAuthorizeHandler implements SubscribeCommandHandler {
     @Override
     public void handle(Message<?> message, StompHeaderAccessor accessor) {
         String destination = accessor.getDestination();
-        String convertedDestination = convertDestination(destination);
+
+        if (destination != null && destination.startsWith(PRIVATE_EXCHANGE_PREFIX)) { // "/user/"로 시작하는 경우는 bypass
+            log.info("[Exchange 권한 검사] User {}에 대한 {} 권한 검사 통과", accessor.getUser().getName(), destination);
+            return;
+        }
 
         // 자원 검사 (구독할 수 없는 데이터라면? connection을 해제할 것인지? 아니면, 구독만 안 되게 할 것인지?)
         // 자원 검사를 위한 path에서 필요한 정보는 어떻게 추출할 것인지?
         // 예를 들어, /sub/chat.exchange/chat.room.1 이라면, client가 1번 채팅방 접근 가능 여부를 판단
         // 잘못 설계하면 추후 다른 path가 추가될 때마다 interceptor를 추가해야 하는데, 범용적으로 해결할 방법이 없을까???
-        if (resourceAccessRegistry.getChecker(convertedDestination).hasPermission(convertedDestination, accessor.getUser())) {
-            log.info("[Exchange 권한 검사] User {}에 대한 {} 권한 검사 통과", accessor.getUser().getName(), convertedDestination);
+        if (resourceAccessRegistry.getChecker(destination).hasPermission(destination, accessor.getUser())) {
+            log.info("[Exchange 권한 검사] User {}에 대한 {} 권한 검사 통과", accessor.getUser().getName(), destination);
+            String convertedDestination = convertDestination(destination);
             accessor.setDestination(convertedDestination);
         } else { // 권한이 없으면 connection은 유지하고, client에게 에러 메시지를 전달
-            log.info("[Exchange 권한 검사] User {}에 대한 {} 권한 검사 실패", accessor.getUser().getName(), convertedDestination);
+            log.info("[Exchange 권한 검사] User {}에 대한 {} 권한 검사 실패", accessor.getUser().getName(), destination);
             throw new InterceptorErrorException(InterceptorErrorCode.UNAUTHORIZED_TO_SUBSCRIBE);
         }
     }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
@@ -31,11 +30,11 @@ public class ReceiptEventHandler {
     @EventListener
     public CompletableFuture<ApplicationListener<RefreshEvent<ServerSideMessage>>> refreshEventListener(final AbstractSubscribableChannel clientOutboundChannel) {
         return CompletableFuture.completedFuture(event -> {
-            log.info("handleRefreshEvent: {}", event);
+            log.info("refreshEventListener: {}", event);
             Message<ServerSideMessage> message = event.getMessage();
             StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-            byte[] payload = parsePayload(message);
+            byte[] payload = convertPayloadToBytes(message);
 
             sendReceiptMessage(clientOutboundChannel, accessor, payload);
         });
@@ -46,11 +45,11 @@ public class ReceiptEventHandler {
     @EventListener
     public CompletableFuture<ApplicationListener<SubscribeEvent<ServerSideMessage>>> subscribeEventListener(final AbstractSubscribableChannel clientOutboundChannel) {
         return CompletableFuture.completedFuture(event -> {
-            log.info("handleSessionSubscribeEvent: {}", event);
+            log.info("subscribeEventListener: {}", event);
             Message<ServerSideMessage> message = event.getMessage();
             StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-            byte[] payload = parsePayload(message);
+            byte[] payload = convertPayloadToBytes(message);
 
             sendReceiptMessage(clientOutboundChannel, accessor, payload);
         });
@@ -61,7 +60,7 @@ public class ReceiptEventHandler {
     @EventListener
     public CompletableFuture<ApplicationListener<SessionSubscribeEvent>> sessionSubscribeEventListener(final AbstractSubscribableChannel clientOutboundChannel) {
         return CompletableFuture.completedFuture(event -> {
-            log.info("handleSessionSubscribeEvent: {}", event);
+            log.info("sessionSubscribeEventListener: {}", event);
             Message<byte[]> message = event.getMessage();
             StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
@@ -73,7 +72,7 @@ public class ReceiptEventHandler {
      * 메시지의 payload를 byte[]로 변환
      * @return 파라미터의 message를 byte[]로 변환한 값. 변환에 실패할 경우 빈 byte[] 반환
      */
-    private byte[] parsePayload(Message<ServerSideMessage> message) {
+    private byte[] convertPayloadToBytes(Message<ServerSideMessage> message) {
         byte[] payload = new byte[0];
         try {
             log.info("message.getPayload(): {}", message.getPayload());
