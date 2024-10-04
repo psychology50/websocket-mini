@@ -17,9 +17,10 @@ public class ChatMessageConsumer {
     @RabbitListener(queues = "${rabbitmq.chat-queue.name}")
     public void receiveMessage(ChatMessage message) {
         log.info("Consume Message = {}", message);
-        String destination = "/topic/chat.room." + message.roomId();
-        log.info("destination = {}", destination);
+        // 키-쌍 저장소에 저장
 
-        rabbitMessagingTemplate.convertAndSend(destination, message);
+        // 메시지의 roomId에 속한 모든 사용자 정보 조회
+
+        // 각 사용자의 상태에 따라 메시지 전달
     }
 }

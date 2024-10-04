@@ -18,6 +18,10 @@ public class ChatRoomAccessChecker implements ResourceAccessChecker {
         return isChatRoomAccess(getChatRoomId(path), principal);
     }
 
+    public boolean hasPermission(Long chatRoomId, Long userId) {
+        return chatRoomService.isExists(chatRoomId, userId);
+    }
+
     /**
      * path에서 chatRoomId를 추출한다.
      *

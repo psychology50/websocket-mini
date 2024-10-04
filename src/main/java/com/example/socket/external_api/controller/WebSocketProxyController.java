@@ -1,15 +1,12 @@
 package com.example.socket.external_api.controller;
 
-import com.example.socket.infra.client.chat.WebSocketProxyHandler;
+import com.example.socket.infra.client.internal.chat.WebSocketProxyHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-
-import java.util.List;
 
 @Slf4j
 @RestController

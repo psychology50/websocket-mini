@@ -4,17 +4,16 @@ version: '3'
 # docker-compose -f docker-compose.yml down
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile-server
+    image: pennyway/socket-test:latest
     container_name: spring-app
     ports:
       - "8080:8080"
     env_file:
-      - .env
+      - .env-total
     depends_on:
       - rabbitmq
       - redis
+      - mysql
     networks:
       - app-network
 
@@ -24,7 +23,8 @@ services:
     ports:
       - "8000:80"
     volumes:
-      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./proxy/test.conf:/etc/nginx/conf.d/default.conf
+      - ./src/main/resources/static:/usr/share/nginx/html
     depends_on:
       - app
     networks:
@@ -58,6 +58,21 @@ services:
     labels:
       - "name=redis"
       - "mode=standalone"
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: socket
+      MYSQL_USER: jayang
+      MYSQL_PASSWORD: secret
+    ports:
+      - "32769:3306"
+    volumes:
+      - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
       - app-network
 

@@ -38,3 +38,5 @@ out/
 
 **/resources/firebase/pennyway**
 .env
+.env-total
+mysql-init/init.sql

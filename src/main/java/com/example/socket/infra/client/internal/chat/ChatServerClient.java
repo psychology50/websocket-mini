@@ -1,4 +1,4 @@
-package com.example.socket.infra.client.chat;
+package com.example.socket.infra.client.internal.chat;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;

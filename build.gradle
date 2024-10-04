@@ -45,6 +45,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	implementation 'org.springframework.amqp:spring-rabbit-stream'
 
+	/* TSID Generator */
+	implementation 'com.github.f4b6a3:tsid-creator:5.2.6'
+
 	/* firebase */
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
 

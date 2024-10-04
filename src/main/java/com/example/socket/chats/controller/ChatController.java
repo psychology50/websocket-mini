@@ -18,8 +18,9 @@ public class ChatController {
     private final ChatMessageService chatMessageService;
 
     @MessageMapping("chat.message.{roomId}")
-    @PreAuthorize("#isAuthenticated(#principal)") // forbidden처리 된 access token으로 접근하면?
+    @PreAuthorize("#isAuthenticated(#principal) and @chatRoomAccessChecker.hasPermission(#roomId, 1L)") // forbidden처리 된 access token으로 접근하면?
     public void sendMessage(@DestinationVariable String roomId, ChatMessage message, Principal principal) {
+        log.info("sendMessage {}: ", message);
         chatMessageService.sendMessage(message);
     }
 

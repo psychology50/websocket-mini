@@ -1,12 +1,10 @@
-package com.example.socket.infra.client.chat;
+package com.example.socket.infra.client.internal.chat;
 
-import com.example.socket.infra.client.chat.dto.WebSocket;
+import com.example.socket.infra.client.internal.chat.dto.WebSocket;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Slf4j

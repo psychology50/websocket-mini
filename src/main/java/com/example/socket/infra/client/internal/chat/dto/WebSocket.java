@@ -1,4 +1,4 @@
-package com.example.socket.infra.client.chat.dto;
+package com.example.socket.infra.client.internal.chat.dto;
 
 import java.util.List;
 import java.util.Map;
