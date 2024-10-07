@@ -1,5 +1,9 @@
 package com.example.socket.infra.config;
 
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -101,7 +105,16 @@ public class RabbitConfig {
     
     // 메시지를 JSON으로 직렬/역직렬화
     @Bean
-    public Jackson2JsonMessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
+    public MessageConverter messageConverter() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
+        objectMapper.registerModule(dateTimeModule());
+
+        return new Jackson2JsonMessageConverter(objectMapper);
+    }
+
+    @Bean
+    public Module dateTimeModule() {
+        return new JavaTimeModule();
     }
 }
