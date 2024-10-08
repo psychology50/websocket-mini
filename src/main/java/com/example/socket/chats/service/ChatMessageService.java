@@ -8,6 +8,7 @@ import com.example.socket.domains.chat.exception.ChatErrorCode;
 import com.example.socket.domains.chat.exception.ChatErrorException;
 import com.example.socket.domains.chat.service.ChatCacheService;
 import com.example.socket.domains.chat.domain.ChatId;
+import com.example.socket.infra.client.internal.broker.MessageBrokerAdapter;
 import com.example.socket.infra.common.exception.MessageBrokerErrorCode;
 import com.example.socket.infra.common.exception.MessageBrokerErrorException;
 import jakarta.persistence.OptimisticLockException;
@@ -24,19 +25,19 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 public class ChatMessageService {
-    private final RabbitTemplate rabbitTemplate;
+    private final MessageBrokerAdapter messageBrokerAdapter;
     private final IdGenerator<Long> idGenerator;
     private final ChatCacheService chatCacheService;
     private final String CHAT_EXCHANGE_NAME;
 
     public ChatMessageService(
             IdGenerator<Long> tsidGenerator,
-            RabbitTemplate rabbitTemplate,
+            MessageBrokerAdapter messageBrokerAdapter,
             ChatCacheService chatCacheService,
             @Value("${rabbitmq.chat-exchange.name}") String CHAT_EXCHANGE_NAME
     ) {
         this.idGenerator = tsidGenerator;
-        this.rabbitTemplate = rabbitTemplate;
+        this.messageBrokerAdapter = messageBrokerAdapter;
         this.chatCacheService = chatCacheService;
         this.CHAT_EXCHANGE_NAME = CHAT_EXCHANGE_NAME;
     }
@@ -71,6 +72,6 @@ public class ChatMessageService {
 
     @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000))
     private void publishToMessageBroker(ChatMessage message) {
-        rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "chat.room." + message.roomId(), message);
+        messageBrokerAdapter.convertAndSend(CHAT_EXCHANGE_NAME, "chat.room." + message.roomId(), message);
     }
 }

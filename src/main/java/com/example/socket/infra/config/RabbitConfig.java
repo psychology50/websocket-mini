@@ -1,5 +1,6 @@
 package com.example.socket.infra.config;
 
+import com.example.socket.infra.client.internal.broker.MessageBrokerAdapter;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -116,5 +117,10 @@ public class RabbitConfig {
     @Bean
     public Module dateTimeModule() {
         return new JavaTimeModule();
+    }
+
+    @Bean
+    MessageBrokerAdapter messageBrokerAdapter(RabbitMessagingTemplate rabbitMessagingTemplate) {
+        return new MessageBrokerAdapter(rabbitMessagingTemplate);
     }
 }
