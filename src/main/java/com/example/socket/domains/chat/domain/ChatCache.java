@@ -1,9 +1,8 @@
-package com.example.socket.domains.chat;
+package com.example.socket.domains.chat.domain;
 
 import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.index.Indexed;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

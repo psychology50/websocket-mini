@@ -1,4 +1,4 @@
-package com.example.socket.domains.chat;
+package com.example.socket.domains.chat.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,6 +10,10 @@ public class ChatId implements Serializable {
     protected ChatId(Long id, Long channelId) {
         this.id = Objects.requireNonNull(id);
         this.channelId = Objects.requireNonNull(channelId);
+    }
+
+    public static ChatId of(Long id, Long channelId) {
+        return new ChatId(id, channelId);
     }
 
     @Override

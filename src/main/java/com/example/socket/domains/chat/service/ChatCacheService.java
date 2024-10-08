@@ -1,5 +1,7 @@
-package com.example.socket.domains.chat;
+package com.example.socket.domains.chat.service;
 
+import com.example.socket.domains.chat.domain.ChatCache;
+import com.example.socket.domains.chat.repository.ChatCacheRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

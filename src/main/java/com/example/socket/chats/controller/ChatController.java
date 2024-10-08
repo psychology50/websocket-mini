@@ -1,6 +1,7 @@
 package com.example.socket.chats.controller;
 
 import com.example.socket.chats.common.annotation.PreAuthorize;
+import com.example.socket.chats.common.security.principal.UserPrincipal;
 import com.example.socket.chats.dto.ChatMessage;
 import com.example.socket.chats.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class ChatController {
     @PreAuthorize("#isAuthenticated(#principal) and @chatRoomAccessChecker.hasPermission(#roomId, 1L)") // forbidden처리 된 access token으로 접근하면?
     public void sendMessage(@DestinationVariable String roomId, ChatMessage message, Principal principal) {
         log.info("sendMessage {}: ", message);
-        chatMessageService.sendMessage(message);
+        chatMessageService.sendMessage(message, (UserPrincipal) principal);
     }
 
     @MessageMapping("chat.message.exception")
